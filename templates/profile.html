@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Foodgram{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Layout */
+    .profile-wrapper {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    /* Top Profile Card */
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 40px;
+    }
+
+    .profile-card-top {
+        background-color: #fffaf5;
+        /* Light orange */
+        /* Add a subtle pattern if desired, otherwise just color */
+        background-image: radial-gradient(#fbd38d 1px, transparent 1px);
+        background-size: 30px 30px;
+        padding: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .profile-info-main {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        object-fit: cover;
+        background-color: #d97706;
+        /* Fallback brown/orange */
+    }
+
+    .edit-avatar-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 32px;
+        height: 32px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .edit-avatar-btn:hover {
+        background: #f9fafb;
+        color: #f97316;
+    }
+
+    .profile-details h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .profile-details .email {
+        font-size: 15px;
+        color: #4b5563;
+        margin-bottom: 12px;
+    }
+
+    .profile-details .bio {
+        font-size: 15px;
+        color: #1f2937;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    .profile-details .meta {
+        display: flex;
+        gap: 20px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .profile-details .meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-edit-profile {
+        padding: 8px 20px;
+        border: 1px solid #fbd38d;
+        background: white;
+        color: #f97316;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-edit-profile:hover {
+        background: #fffaf5;
+        border-color: #f97316;
+    }
+
+    .btn-more {
+        width: 38px;
+        height: 38px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        color: #4b5563;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-more:hover {
+        background: #f9fafb;
+    }
+
+    /* Stats Row */
+    .profile-stats {
+        display: flex;
+        padding: 25px 0;
+        background: white;
+    }
+
+    .stat-item {
+        flex: 1;
+        text-align: center;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .stat-item:last-child {
+        border-right: none;
+    }
+
+    .stat-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #4b5563;
+        font-weight: 500;
+    }
+
+    /* Bottom Section Tabs */
+    .profile-tabs {
+        display: flex;
+        gap: 30px;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 30px;
+    }
+
+    .profile-tab {
+        padding: 10px 0 15px 0;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.2s ease;
+    }
+
+    .profile-tab:hover {
+        color: #1f2937;
+    }
+
+    .profile-tab.active {
+        color: #f97316;
+    }
+
+    .profile-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #f97316;
+        border-radius: 3px 3px 0 0;
+    }
+
+    /* Content Area */
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 40px;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+        text-align: center;
+    }
+
+    .empty-illustration {
+        width: 120px;
+        height: 120px;
+        background: #fffaf5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .empty-illustration i {
+        font-size: 50px;
+        color: #fbd38d;
+    }
+
+    .empty-illustration .deco-dot {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #f97316;
+        border-radius: 50%;
+    }
+
+    .content-card h3 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .content-card p {
+        color: #6b7280;
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+    .btn-primary-orange {
+        background: #f97316;
+        color: white;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary-orange:hover {
+        background: #ea580c;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+    }
+
+    /* Sidebar Following Card */
+    .following-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+    }
+
+    .following-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+    }
+
+    .following-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .following-item:last-child {
+        border-bottom: none;
+    }
+
+    .following-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .following-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e5e7eb;
+    }
+
+    .following-details h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 2px 0;
+    }
+
+    .following-details p {
+        font-size: 12px;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .btn-view-profile {
+        padding: 6px 16px;
+        border: 1px solid #fbd38d;
+        background: transparent;
+        color: #f97316;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 12px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-view-profile:hover {
+        background: #fffaf5;
+        border-color: #f97316;
+    }
+
+    .btn-see-all {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        background: #fffaf5;
+        color: #f97316;
+        border: 1px solid #fbd38d;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-see-all:hover {
+        background: #ffedd5;
+    }
+
+    /* Recipe Grid (if recipes exist) */
+    .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        width: 100%;
+    }
+
+    .recipe-card-mini {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .recipe-card-mini img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .recipe-card-mini-body {
+        padding: 15px;
+    }
+
+    .recipe-card-mini-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .recipe-card-mini-meta {
+        font-size: 13px;
+        color: #6b7280;
+        display: flex;
+        gap: 15px;
+    }
+
+    /* Footer */
+    .footer {
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        padding: 40px 80px;
+        margin-top: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .footer-left .brand {
+        font-family: 'Rokkitt', serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-orange);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .footer-left p {
+        color: #6b7280;
+        font-size: 14px;
+        margin: 0;
+        max-width: 400px;
+    }
+
+    .footer-right {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+</style>
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Main Profile Content -->
+<div class="profile-wrapper">
+
+    <!-- Top Profile Card -->
+    <div class="profile-card">
+        <div class="profile-card-top">
+            <div class="profile-info-main">
+                <div class="profile-avatar-container">
+                    {% if user.bio.img %}
+                    <img src="{{ user.bio.img.url }}" alt="Profile Avatar" class="profile-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default_profile.jpg' %}"
+                        onerror="this.src='https://ui-avatars.com/api/?name={{user.username}}&background=random&size=200'"
+                        alt="Profile Avatar" class="profile-avatar">
+                    {% endif %}
+                    <a href="/editProfile" class="edit-avatar-btn">
+                        <i class="fa-solid fa-pen" style="font-size: 12px;"></i>
+                    </a>
+                </div>
+
+                <div class="profile-details">
+                    <h2>{{ user.first_name|default:user.username }}</h2>
+                    <div class="email">{{ user.email|default:"user@example.com" }}</div>
+                    <div class="bio">{{ user.bio.bio|default:"Hi, I'm here 👋" }}</div>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-location-dot"></i> India</span>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <a href="/editProfile" class="btn-edit-profile">
+                    <i class="fa-solid fa-pen"></i> Edit Profile
+                </a>
+                <button class="btn-more" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/editProfile">Account Settings</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-num">{{ post|default:"0" }}</div>
+                <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{{ followers|default:"0" }}</div>
+                <div class="stat-label">Followers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{{ following|default:"0" }}</div>
+                <div class="stat-label">Following</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lower Section: Tabs & Content -->
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Tabs -->
+            <div class="profile-tabs">
+                <a href="#" class="profile-tab active" id="tab-my-recipes"
+                    onclick="toggleProfileTabs('my-recipes', event)"><i class="fa-solid fa-book-open"></i> My
+                    Recipes</a>
+                <a href="#" class="profile-tab" id="tab-saved-recipes"
+                    onclick="toggleProfileTabs('saved-recipes', event)"><i class="fa-regular fa-bookmark"></i> Saved
+                    Recipes</a>
+            </div>
+
+            <!-- Main Content Area -->
+            <div id="section-my-recipes">
+                {% if dish %}
+                <!-- Grid of user's recipes -->
+                <div class="row g-4">
+                    {% for i in dish %}
+                    <div class="col-md-6 col-lg-6">
+                        {% include 'post_card.html' %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty State (No recipes yet) -->
+                <div class="content-card">
+                    <div class="empty-illustration">
+                        <i class="fa-solid fa-hat-chef"></i>
+                        <div class="deco-dot" style="top: 20px; left: -10px;"></div>
+                        <div class="deco-dot"
+                            style="top: -10px; right: 20px; background: #fbd38d; width: 6px; height: 6px;"></div>
+                        <div class="deco-dot" style="bottom: 20px; right: -15px; width: 10px; height: 10px;"></div>
+                    </div>
+                    <h3>No recipes yet!</h3>
+                    <p>Share your first recipe with the Foodgram community.</p>
+                    <a href="/addRecipe" class="btn-primary-orange">
+                        <i class="fa-solid fa-plus"></i> Add Your First Recipe
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div id="section-saved-recipes" style="display: none;">
+                {% if saved_items %}
+                <!-- Grid of saved recipes -->
+                <div class="row g-4">
+                    {% for item in saved_items %}
+                    <div class="col-md-6 col-lg-6">
+                        {% with i=item.dish %}
+                        {% include 'post_card.html' %}
+                        {% endwith %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty State (No saved recipes yet) -->
+                <div class="content-card">
+                    <div class="empty-illustration">
+                        <i class="fa-regular fa-bookmark"></i>
+                        <div class="deco-dot" style="top: 20px; left: -10px;"></div>
+                        <div class="deco-dot"
+                            style="top: -10px; right: 20px; background: #fbd38d; width: 6px; height: 6px;"></div>
+                        <div class="deco-dot" style="bottom: 20px; right: -15px; width: 10px; height: 10px;"></div>
+                    </div>
+                    <h3>No Saved Recipes</h3>
+                    <p>You haven't saved any recipes yet. Explore our collection to find your next favorite dish!</p>
+                    <a href="/explore" class="btn-primary-orange">
+                        <i class="fa-solid fa-magnifying-glass"></i> Explore Recipes
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleProfileTabs(tabName, event) {
+        if (event) event.preventDefault();
+
+        // Update Tabs
+        document.getElementById('tab-my-recipes').classList.remove('active');
+        document.getElementById('tab-saved-recipes').classList.remove('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+
+        // Update Sections
+        document.getElementById('section-my-recipes').style.display = 'none';
+        document.getElementById('section-saved-recipes').style.display = 'none';
+        document.getElementById('section-' + tabName).style.display = 'block';
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/follow/')) {
+                    this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                } else if (href.startsWith('/unfollow/')) {
+                    this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+</script>
+{% endblock %}

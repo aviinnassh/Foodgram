@@ -1,0 +1,116 @@
+<div class="recipe-card">
+    <!-- Card Header: User Info -->
+    <div class="card-header-user" style="padding: 12px 15px;">
+        <a href="/viewUser/{{i.user.pk}}" class="user-meta" style="font-size: 13px;">
+            {% if i.user.username == 'admin' %}
+            <img src="https://ui-avatars.com/api/?name={{ i.fake_author_name|urlencode }}&background=fbd38d&color=d97706"
+                alt="{{ i.fake_author_name }}" style="width: 24px; height: 24px;">
+            <span>{{ i.fake_author_name }} <i class="fa-solid fa-wand-magic-sparkles"
+                    style="color: var(--primary-orange);"></i></span>
+            {% else %}
+            <img src="{% if i.user.bio.img %}{{ i.user.bio.img.url }}{% else %}https://ui-avatars.com/api/?name={{i.user.first_name|default:i.user.username}}&background=random&color=fff{% endif %}"
+                alt="{{i.user.first_name}}" style="width: 24px; height: 24px;">
+            <span>{{i.user.first_name|default:i.user.username}} {{i.user.last_name}}</span>
+            {% endif %}
+        </a>
+        <div class="dropdown">
+            <button class="btn-card-more" data-bs-toggle="dropdown" style="font-size: 14px; padding: 2px;">
+                <i class="fa-solid fa-ellipsis"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                {% if request.user != i.user %}
+                <li><a class="dropdown-item" href="/report/{{i.pk}}"><i class="fa-solid fa-flag me-2"></i> Report</a></li>
+                {% endif %}
+                {% if i.pk in saved_dishes %}
+                <li><a class="dropdown-item" href="/unsave/{{i.pk}}"><i class="fa-solid fa-bookmark me-2"></i> Unsave</a></li>
+                {% else %}
+                <li><a class="dropdown-item" href="/save/{{i.pk}}"><i class="fa-regular fa-bookmark me-2"></i> Save</a></li>
+                {% endif %}
+                {% if request.user == i.user %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/edit/{{i.pk}}"><i class="fa-solid fa-pen me-2"></i> Edit</a></li>
+                <li><a class="dropdown-item text-danger" href="/delete/{{i.pk}}"><i class="fa-solid fa-trash me-2"></i> Delete</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Card Image -->
+    <div class="card-img-wrap" style="position: relative; height: 220px;">
+        {% if i.is_ai_recommended %}
+        <span
+            style="position: absolute; top: 12px; left: 12px; background: rgba(255, 255, 255, 0.95); color: var(--primary-orange); padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 2;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Recommended
+        </span>
+        {% endif %}
+        <img loading="lazy"
+            src="{% if i.img %}{{ i.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80{% endif %}"
+            alt="{{ i.name }}">
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-content" style="padding: 12px 15px;">
+        <div class="card-stats" style="margin-bottom: 8px;">
+            <div class="stat-item">
+                <a href="javascript:void(0)" onclick="toggleLike(this, '{{ i.pk }}')" class="text-decoration-none">
+                    {% if i.pk in liked_dishes %}
+                    <i class="fa-solid fa-heart"></i> <span class="like-count">{{ i.likes }}</span>
+                    {% else %}
+                    <i class="fa-regular fa-heart"></i> <span class="like-count">{{ i.likes }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            <div class="stat-item">
+                <a href="/feedbacks/{{i.pk}}" class="link-feedbacks text-decoration-none" style="font-size: 12px;">Feedbacks</a>
+            </div>
+        </div>
+
+        <h3 style="font-size: 16px; margin: 0 0 10px;" class="text-truncate">{{i.name}}</h3>
+
+        <div class="recipe-info-line d-flex flex-wrap align-items-center gap-2 mb-1" style="font-size: 11px;">
+            <span
+                style="display: flex; align-items: center; gap: 4px; color: var(--primary-orange); font-weight: 600;"><i
+                    class="fa-solid fa-tag"></i> {{i.category}}</span>
+            <span style="display: flex; align-items: center; gap: 4px;"><i class="fa-solid fa-utensils"></i>
+                {{i.cuisine}}</span>
+            <span style="display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-clock"></i> {{i.prep}}m</span>
+            <span style="display: flex; align-items: center; gap: 4px;"><i class="fa-solid fa-fire-burner"></i>
+                {{i.cook}}m</span>
+        </div>
+    </div>
+
+    <!-- Card Footer: Actions -->
+    <div class="card-footer-btns d-flex gap-2 px-3 pb-3 pt-0">
+        <a href="/dish/{{i.pk}}" class="btn-recipe btn-recipe-primary text-center" style="width: 100%; border-radius: 50px; text-decoration: none; padding: 8px;">View Recipe</a>
+    </div>
+</div>
+
+<script>
+    if (typeof window.toggleLike !== 'function') {
+        window.toggleLike = function (element, dishId) {
+            // Prevent default behavior if any
+            fetch(`/like/${dishId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const icon = element.querySelector('i');
+                    const countSpan = element.querySelector('.like-count');
+
+                    countSpan.innerText = data.like_count;
+
+                    if (data.liked) {
+                        icon.classList.remove('fa-regular');
+                        icon.classList.add('fa-solid');
+                    } else {
+                        icon.classList.remove('fa-solid');
+                        icon.classList.add('fa-regular');
+                    }
+                })
+                .catch(error => console.error('Error toggling like:', error));
+        }
+    }
+</script>

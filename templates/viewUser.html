@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user.first_name }}'s Profile - Foodgram{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .profile-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 40px;
+        }
+
+        .profile-card-top {
+            background-color: #fffaf5;
+            background-image: radial-gradient(#fbd38d 1px, transparent 1px);
+            background-size: 30px 30px;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .profile-info-main {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .profile-avatar-container {
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            object-fit: cover;
+            background-color: #d97706;
+        }
+
+        .profile-details h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .profile-details .username {
+            font-size: 15px;
+            color: #4b5563;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .profile-details .bio {
+            font-size: 15px;
+            color: #1f2937;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .profile-stats {
+            display: flex;
+            padding: 25px 0;
+            background: white;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="profile-wrapper">
+        <!-- Top Profile Card -->
+        <div class="profile-card">
+            <div class="profile-card-top">
+                <div class="profile-info-main">
+                    <div class="profile-avatar-container">
+                        {% if user.username == 'admin' %}
+                        <img src="https://ui-avatars.com/api/?name=Chef+AI&background=fbd38d&color=d97706&size=200" alt="Chef AI" class="profile-avatar">
+                        {% elif user.bio.img %}
+                        <img src="{{ user.bio.img.url }}" alt="Profile Avatar" class="profile-avatar">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{user.username}}&background=random&size=200"
+                            alt="Profile Avatar" class="profile-avatar">
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-details">
+                        {% if user.username == 'admin' %}
+                        <h2>Chef AI <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-orange); font-size: 20px;"></i></h2>
+                        <div class="username">@foodgram_ai</div>
+                        <div class="bio">I am your personal AI Chef! I recommend the best recipes. ✨</div>
+                        {% else %}
+                        <h2>{{ user.first_name|default:user.username }}</h2>
+                        <div class="username">@{{ user.username }}</div>
+                        <div class="bio">{{ user.bio.bio|default:"Hi, I'm using Foodgram 👋" }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    {% if user1 != user and user.username != 'admin' %}
+                        {% if is_following %}
+                        <a href="/unfollow/{{user.pk}}" class="btn btn-outline-dark follow" style="padding: 10px 24px; border-radius: 50px; font-weight: 600;"><i class="fa-solid fa-user-minus"></i> Unfollow</a>
+                        {% else %}
+                        <a href="/follow/{{user.pk}}" class="btn btn-dark follow" style="padding: 10px 24px; border-radius: 50px; font-weight: 600; background: var(--primary-orange); border: none;"><i class="fa-solid fa-user-plus"></i> Follow</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-num">{{ post|default:"0" }}</div>
+                    <div class="stat-label">Posts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">{{ followers|default:"0" }}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">{{ following|default:"0" }}</div>
+                    <div class="stat-label">Following</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div>
+                {% if user.username == 'admin' %}
+                <h2>Recipes by Chef AI</h2>
+                {% else %}
+                <h2>Recipes by {{ user.first_name|default:user.username }}</h2>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if dish %}
+        <div class="row g-4">
+            {% for i in dish %}
+            <div class="col-md-6 col-lg-6">
+                {% include 'post_card.html' %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 16px; border: 1px solid #e5e7eb;">
+            <i class="fa-solid fa-hat-chef" style="font-size: 48px; color: #fbd38d; margin-bottom: 15px;"></i>
+            <h3 style="font-size: 20px; font-weight: 700;">No recipes yet</h3>
+            <p style="color: #6b7280; margin: 0;">{{ user.first_name|default:user.username }} hasn't posted any recipes.</p>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function(e) {
+                // If it's the main profile follow/unfollow button, let it redirect normally
+                if (this.classList.contains('follow')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+
+    // Toggle Recipe Expanded Content
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('toggle-recipe-btn')) {
+            e.preventDefault();
+            const card = e.target.closest('.recipe-card');
+            if (card) {
+                const content = card.querySelector('.recipe-expanded-content');
+                if (content) {
+                    content.classList.toggle('show');
+                    if (content.classList.contains('show')) {
+                        content.style.display = 'block';
+                        e.target.innerText = 'Hide Recipe';
+                    } else {
+                        content.style.display = 'none';
+                        e.target.innerText = 'View Recipe';
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

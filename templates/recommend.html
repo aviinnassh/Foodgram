@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Foodgram - Recommended Recipes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        text-align: center;
+        padding: 60px 20px 40px;
+        background: linear-gradient(to bottom, #fffaf5, transparent);
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 40px;
+    }
+
+    .page-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .page-subtitle {
+        font-size: 16px;
+        color: var(--text-dim);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border-light);
+        margin: 0 auto 60px;
+        max-width: 600px;
+    }
+
+    .empty-state h4 {
+        color: var(--text-dark);
+        font-weight: 700;
+        margin-top: 20px;
+    }
+
+    .empty-state p {
+        color: var(--text-dim);
+        margin-bottom: 25px;
+    }
+
+    .btn-explore {
+        background: var(--primary-orange);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: var(--transition);
+    }
+
+    .btn-explore:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Header Section -->
+    <div class="page-header">
+        <h1 class="page-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-orange);"></i> AI Recommendations</h1>
+        <p class="page-subtitle">Based on your interest in <span style="color: var(--primary-orange); font-weight: 600;">{{ current_dish.name }}</span></p>
+    </div>
+
+    <!-- Recipe Grid -->
+    <div class="container-fluid px-5" style="padding: 0 80px !important;">
+        {% if recommended or new_dataset %}
+        <div class="row g-4 mb-5">
+            {% for i in recommended %}
+            <div class="col-md-4 col-lg-3">
+                {% include 'post_card.html' %}
+            </div>
+            {% endfor %}
+            
+            {% for i in new_dataset %}
+            <div class="col-md-4 col-lg-3">
+                {% include 'post_card.html' %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-robot fa-4x mb-3" style="color: var(--text-dim); opacity: 0.5;"></i>
+            <h4>No recommendations found 😔</h4>
+            <p>Try exploring more recipes to help our AI learn your taste preferences.</p>
+            <a href="/explore" class="btn-explore">Explore Recipes</a>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

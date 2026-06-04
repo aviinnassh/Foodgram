@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ data.name }} - Foodgram{% endblock %}
+
+{% block extra_css %}
+<style>
+
+        /* Dish Detail Container */
+        .dish-page-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .dish-hero-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 992px) {
+            .dish-hero-card {
+                flex-direction: row;
+            }
+        }
+
+        .dish-image-section {
+            flex: 1;
+            position: relative;
+        }
+
+        .dish-image-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            min-height: 400px;
+        }
+
+        .dish-info-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .author-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--light-orange);
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .author-meta h5 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .author-meta a {
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .author-meta a:hover {
+            color: var(--primary-orange);
+        }
+
+        .dish-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            margin: 0 0 10px;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .dish-cuisine {
+            color: var(--primary-orange);
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dish-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: var(--bg-lightest);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-box i {
+            font-size: 24px;
+            color: var(--primary-orange);
+        }
+
+        .stat-info h6 {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .stat-info p {
+            margin: 0;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-like {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #ffe4e6;
+        }
+
+        .btn-like:hover {
+            background: #ffe4e6;
+            transform: translateY(-2px);
+            color: #e11d48;
+        }
+
+        .btn-like.liked {
+            background: #e11d48;
+            color: white;
+            border-color: #e11d48;
+        }
+
+        .btn-like.liked:hover {
+            background: #be123c;
+            color: white;
+        }
+
+        .btn-save {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #dcfce7;
+        }
+
+        .btn-save.saved {
+            background: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+
+        .btn-save:hover {
+            background: #dcfce7;
+            transform: translateY(-2px);
+            color: #16a34a;
+        }
+
+        .btn-save.saved:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-feedback {
+            background: var(--light-orange);
+            color: var(--primary-orange);
+            border: 1px solid #fed7aa;
+        }
+
+        .btn-feedback:hover {
+            background: #fed7aa;
+            transform: translateY(-2px);
+            color: var(--primary-dark);
+        }
+
+        .dropdown-menu {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-light);
+        }
+
+        .dropdown-item {
+            font-weight: 500;
+            color: var(--text-dark);
+            padding: 8px 20px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-lightest);
+            color: var(--primary-orange);
+        }
+
+        /* Tabs and Details Area */
+        .details-container {
+            margin-top: 40px;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-light);
+        }
+
+        .nav-pills .nav-link {
+            color: var(--text-dim);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 50px;
+            transition: var(--transition);
+        }
+
+        .nav-pills .nav-link.active,
+        .nav-pills .show>.nav-link {
+            color: white;
+            background-color: var(--primary-orange);
+        }
+
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: var(--light-orange);
+            color: var(--primary-orange);
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            background: var(--light-orange);
+            color: var(--primary-orange);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .ingr-icon {
+            color: var(--primary-orange);
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 992px) {
+            .dish-image-section img {
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .dish-info-section {
+                padding: 25px;
+            }
+
+            .dish-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dish-title {
+                font-size: 28px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .details-container {
+                padding: 25px;
+            }
+
+            .nav-pills {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Dish Page Content -->
+    <div class="dish-page-container">
+
+        <!-- Hero Card -->
+        <div class="dish-hero-card fade-in">
+            <div class="dish-image-section">
+                <img src="{% if data.img %}{{ data.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80{% endif %}"
+                    alt="{{ data.name }}">
+            </div>
+
+            <div class="dish-info-section">
+
+                <div class="author-row">
+                    <div class="author-meta">
+                        <div class="author-avatar">{{ data.user.first_name|slice:":1"|default:"U" }}</div>
+                        <div>
+                            <p style="margin:0; font-size: 13px; color: var(--text-dim); font-weight: 500;">Recipe by
+                            </p>
+                            <h5><a href="../viewUserAdmin/{{data.user.pk}}">{{data.user.first_name}}
+                                    {{data.user.last_name}}</a></h5>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown"
+                            style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light);">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if request.user != data.user %}
+                            <li><a class="dropdown-item" href="/report/{{data.pk}}"><i class="fa-solid fa-flag me-2 text-danger"></i> Report Recipe</a></li>
+                            {% endif %}
+                            {% if request.user == data.user %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/edit/{{data.pk}}"><i class="fa-solid fa-pen me-2"></i> Edit Recipe</a></li>
+                            <li><a class="dropdown-item text-danger" href="/delete/{{data.pk}}"><i class="fa-solid fa-trash me-2"></i> Delete</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <h1 class="dish-title" style="margin-bottom: 15px;">{{data.name}}</h1>
+
+                <div class="dish-cuisine" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; align-items: center;">
+                    <span class="badge bg-light text-dark border border-secondary" style="font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 50px;">
+                        <i class="fa-solid fa-utensils text-primary me-1" style="color: var(--primary-orange) !important;"></i> Cuisine: {{data.cuisine}}
+                    </span>
+                    <span class="badge bg-light text-dark border border-secondary" style="font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 50px;">
+                        <i class="fa-solid fa-layer-group text-primary me-1" style="color: var(--primary-orange) !important;"></i> Category: {{data.category}}
+                    </span>
+                </div>
+
+                <div class="dish-stats-grid mt-4">
+                    <div class="stat-box">
+                        <i class="fa-regular fa-clock"></i>
+                        <div class="stat-info">
+                            <h6>Prep Time</h6>
+                            <p>{{data.prep}} mins</p>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fa-solid fa-fire-burner"></i>
+                        <div class="stat-info">
+                            <h6>Cook Time</h6>
+                            <p>{{data.cook}} mins</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar mt-auto">
+                    <a href="javascript:void(0)" onclick="toggleLike(this, '{{ data.pk }}')" class="btn-action btn-like {% if data.pk in liked_dishes %}liked{% endif %}">
+                        {% if data.pk in liked_dishes %}
+                        <i class="fa-solid fa-heart"></i> <span class="like-count">{{ data.likes }}</span> Liked
+                        {% else %}
+                        <i class="fa-regular fa-heart"></i> <span class="like-count">{{ data.likes }}</span> Like
+                        {% endif %}
+                    </a>
+
+                    {% if data.pk in saved_dishes %}
+                    <a href="/unsave/{{data.pk}}" class="btn-action btn-save saved">
+                        <i class="fa-solid fa-bookmark"></i> Saved
+                    </a>
+                    {% else %}
+                    <a href="/save/{{data.pk}}" class="btn-action btn-save">
+                        <i class="fa-regular fa-bookmark"></i> Save
+                    </a>
+                    {% endif %}
+
+                    <a href="/feedbacks/{{data.pk}}" class="btn-action btn-feedback">
+                        <i class="fa-regular fa-comment-dots"></i> Feedbacks
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Container (Ingredients & Steps) -->
+        <div class="details-container slide-up" style="animation-delay: 0.1s;">
+            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-ingredients-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-ingredients" type="button" role="tab"><i
+                            class="fa-solid fa-basket-shopping me-2"></i>Ingredients</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-steps-tab" data-bs-toggle="pill" data-bs-target="#pills-steps"
+                        type="button" role="tab"><i class="fa-solid fa-list-ol me-2"></i>Cooking Steps</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                <!-- Ingredients Tab -->
+                <div class="tab-pane fade show active" id="pills-ingredients" role="tabpanel">
+                    <div class="list-group list-group-flush">
+                        {% for j in ingr %}
+                        {% if data.pk == j.dish.pk %}
+                        <div class="list-group-item">
+                            <i class="fa-solid fa-check-circle ingr-icon"></i>
+                            <span>{{j.item}}</span>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        <!-- Fallback if no ingredients -->
+                        {% if not ingr %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-basket-shopping fa-3x mb-3" style="color: var(--border-light);"></i>
+                            <p>No ingredients listed for this recipe.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Steps Tab -->
+                <div class="tab-pane fade" id="pills-steps" role="tabpanel">
+                    <div class="list-group list-group-flush">
+                        {% for j in cook %}
+                        {% if data.pk == j.dish.pk %}
+                        <div class="list-group-item">
+                            <div class="step-number"><i class="fa-solid fa-chevron-right"></i></div>
+                            <div>
+                                <p class="mb-0" style="margin-top: 5px; line-height: 1.6; color: var(--text-dark);">
+                                    {{j.steps}}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        <!-- Fallback if no steps -->
+                        {% if not cook %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-list-ol fa-3x mb-3" style="color: var(--border-light);"></i>
+                            <p>No cooking steps provided for this recipe.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        // Set active class dynamically based on current path
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') !== '/' && path.includes(link.getAttribute('href'))) {
+                    link.classList.add('active');
+                } else if (path === '/' && link.getAttribute('href') === '/') {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+
+                    // Visual update immediately for snappiness
+                    if (href.startsWith('/save/')) {
+                        this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                        this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                    } else if (href.startsWith('/unsave/')) {
+                        this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                        this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                    } else if (href.startsWith('/follow/')) {
+                        this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                        this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                    } else if (href.startsWith('/unfollow/')) {
+                        this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                        this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                    } else if (href.startsWith('/report/')) {
+                        this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                        this.style.pointerEvents = 'none';
+                    }
+
+                    // Send background request
+                    fetch(href, {
+                        method: 'GET',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).catch(err => console.error("Error:", err));
+                });
+            });
+        });
+
+        if (typeof window.toggleLike !== 'function') {
+            window.toggleLike = function (element, dishId) {
+                // Prevent default behavior if any
+                fetch(`/like/${dishId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const icon = element.querySelector('i');
+                        const countSpan = element.querySelector('.like-count');
+
+                        countSpan.innerText = data.like_count;
+
+                        if (data.liked) {
+                            icon.classList.remove('fa-regular');
+                            icon.classList.add('fa-solid');
+                            element.classList.add('liked');
+                            element.innerHTML = `<i class="fa-solid fa-heart"></i> <span class="like-count">${data.like_count}</span> Liked`;
+                        } else {
+                            icon.classList.remove('fa-solid');
+                            icon.classList.add('fa-regular');
+                            element.classList.remove('liked');
+                            element.innerHTML = `<i class="fa-regular fa-heart"></i> <span class="like-count">${data.like_count}</span> Like`;
+                        }
+                    })
+                    .catch(error => console.error('Error toggling like:', error));
+            }
+        }
+    </script>
+
+{% endblock %}

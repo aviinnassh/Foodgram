@@ -1,0 +1,992 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Recipe - Foodgram{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Content Area */
+    body {
+        background-color: #fdfbf9; /* Soft off-white */
+    }
+
+    .add-recipe-wrapper {
+        max-width: 1150px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        margin-bottom: 40px;
+    }
+
+    .page-header h2 {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        color: #6b7280;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-line {
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-orange), #ff9c59);
+        border-radius: 3px;
+    }
+
+    /* Form Sections */
+    .form-section {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        padding: 35px;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-section:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .step-num {
+        background: linear-gradient(135deg, var(--primary-orange), #ea580c);
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .custom-input {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 15px;
+        color: #1f2937;
+        background-color: #f9fafb;
+        transition: all 0.3s ease;
+    }
+
+    .custom-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .custom-input:focus {
+        background-color: white;
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+        outline: none;
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: 1px solid #e5e7eb;
+        border-right: none;
+        color: var(--primary-orange);
+        border-radius: 12px 0 0 12px;
+        background-color: #f9fafb;
+        transition: all 0.3s ease;
+    }
+
+    .input-wrapper:focus-within .input-group-text {
+        background-color: white;
+        border-color: var(--primary-orange);
+    }
+
+    .input-with-icon {
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        padding-left: 0;
+    }
+
+    .input-suffix {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+        pointer-events: none;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    /* Photo Upload Area */
+    .photo-upload-area {
+        border: 2px dashed #fcd34d;
+        border-radius: 16px;
+        padding: 50px 20px;
+        text-align: center;
+        background: linear-gradient(180deg, #fffaf5 0%, white 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .photo-upload-area:hover {
+        border-color: var(--primary-orange);
+        background: #fffaf5;
+    }
+
+    .upload-icon {
+        font-size: 42px;
+        color: var(--primary-orange);
+        margin-bottom: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-upload-area:hover .upload-icon {
+        transform: translateY(-5px);
+    }
+
+    .upload-text {
+        font-size: 16px;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .upload-hint {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 15px;
+        font-weight: 500;
+    }
+
+    .btn-choose {
+        background: white;
+        color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        padding: 10px 28px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.2s ease;
+    }
+
+    .btn-choose:hover {
+        background: var(--primary-orange);
+        color: white;
+    }
+
+    #image-preview-wrapper {
+        display: none;
+        position: relative;
+        width: 100%;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    #image-preview-element {
+        width: 100%;
+        height: auto;
+        max-height: 400px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .remove-image-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #ef4444;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+    }
+
+    .remove-image-btn:hover {
+        background: #ef4444;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* Ingredients */
+    .btn-add-ingr {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-add-ingr:hover {
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .ingredient-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        margin-bottom: 10px;
+        background: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .ingredient-item:hover {
+        background: white;
+        border-color: #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .ingredient-text {
+        font-size: 15px;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .ingredient-bullet {
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .ingredient-actions button {
+        background: white;
+        border: 1px solid #fee2e2;
+        color: #ef4444;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .ingredient-actions button:hover {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
+    /* Right Sidebar Cards */
+    .preview-card,
+    .tips-card,
+    .motivation-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .card-heading {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.2px;
+    }
+
+    .preview-img-container {
+        background: #f3f4f6;
+        aspect-ratio: 4/3;
+        height: auto;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .preview-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+    }
+
+    .preview-img-container i {
+        font-size: 36px;
+        margin-bottom: 12px;
+        color: #d1d5db;
+    }
+
+    .preview-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-top: 20px;
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .preview-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .preview-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f3f4f6;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+
+    .tips-list li {
+        font-size: 13px;
+        color: #4b5563;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        line-height: 1.5;
+    }
+    
+    .tips-list li i {
+        margin-top: 2px;
+        font-size: 15px;
+    }
+
+    .motivation-card {
+        background: linear-gradient(135deg, #fffaf5, #fff);
+        border: 1px solid #ffedd5;
+        box-shadow: 0 10px 20px rgba(249, 115, 22, 0.05);
+    }
+
+    .icon-circle-lg {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 2px solid white;
+    }
+
+    .btn-publish {
+        background: linear-gradient(135deg, var(--primary-orange), #ea580c);
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 6px 16px rgba(249, 115, 22, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-publish:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: white;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #f9fafb;
+        color: #1f2937;
+    }
+</style>
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Main Content -->
+<form action="" method="post" enctype="multipart/form-data" id="recipeForm">
+    {% csrf_token %}
+    <div class="add-recipe-wrapper">
+        <div class="row">
+            <!-- Left Column: Form -->
+            <div class="col-lg-8">
+                <div class="page-header">
+                    <h2>Edit Recipe</h2>
+                    <p><span class="header-line"></span> Update your recipe details</p>
+                </div>
+
+                <!-- Step 1 -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="step-num">1</span> Basic Information
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Name of the dish <span class="required">*</span></label>
+                        <input type="text" class="form-control custom-input" name="name" id="inputName"
+                            value="{{data.name}}" required>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Cuisine <span class="required">*</span></label>
+                            <select class="form-select custom-input" name="cuisine" id="inputCuisine" required>
+                                <option value="" disabled>Select cuisine</option>
+                                <option value="Italian" {% if data.cuisine == "Italian" %}selected{% endif %}>Italian</option>
+                                <option value="Indian" {% if data.cuisine == "Indian" %}selected{% endif %}>Indian</option>
+                                <option value="Mexican" {% if data.cuisine == "Mexican" %}selected{% endif %}>Mexican</option>
+                                <option value="Chinese" {% if data.cuisine == "Chinese" %}selected{% endif %}>Chinese</option>
+                                <option value="American" {% if data.cuisine == "American" %}selected{% endif %}>American</option>
+                                <option value="Other" {% if data.cuisine == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mt-4 mt-md-0">
+                            <label class="form-label">Dish Category <span class="required">*</span></label>
+                            <select class="form-select custom-input" name="category" id="inputCategory">
+                                <option disabled>Select category</option>
+                                <option value="Breakfast" {% if data.category == "Breakfast" %}selected{% endif %}>Breakfast</option>
+                                <option value="Lunch" {% if data.category == "Lunch" %}selected{% endif %}>Lunch</option>
+                                <option value="Dinner" {% if data.category == "Dinner" %}selected{% endif %}>Dinner</option>
+                                <option value="Desserts" {% if data.category == "Desserts" %}selected{% endif %}>Desserts</option>
+                                <option value="Healthy" {% if data.category == "Healthy" %}selected{% endif %}>Healthy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Preparation Time <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                    <input type="number" class="form-control custom-input input-with-icon" name="prep"
+                                        id="inputPrep" value="{{data.prep}}" required>
+                                </div>
+                                <span class="input-suffix">min</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-4 mt-md-0">
+                            <label class="form-label">Cooking Time <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                                    <input type="number" class="form-control custom-input input-with-icon" name="cook"
+                                        id="inputCook" value="{{data.cook}}" required>
+                                </div>
+                                <span class="input-suffix">min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="step-num">2</span> Add Photo
+                    </div>
+
+                    <div id="upload-container">
+                        <label for="img" class="photo-upload-area w-100 d-block m-0">
+                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                            <div class="upload-text">Drag and drop your image here<br><span
+                                    style="font-size: 12px; font-weight: 400;">or</span></div>
+                            <span class="btn-choose">Choose File</span>
+                            <input type="file" name="img" id="img" class="d-none" accept="image/*">
+                            <div class="upload-hint">JPG, PNG or WEBP (Max. 5MB)</div>
+                        </label>
+                    </div>
+
+                    <div id="image-preview-wrapper" class="mt-3">
+                        <img id="image-preview-element" src="{% if data.img %}{{ data.img.url }}{% endif %}" alt="Preview">
+                        <button type="button" class="remove-image-btn" id="remove-img-btn"><i
+                                class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="step-num">3</span> Ingredients
+                    </div>
+                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 15px;">Add all the ingredients for
+                        your recipe</p>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <input type="text" class="form-control custom-input" id="ingredientInput"
+                            placeholder="e.g. 2 cups of flour">
+                        <button type="button" class="btn-add-ingr" id="addIngredientBtn">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+
+                    <!-- Ingredient List Container -->
+                    <div id="ingredientsList">
+                        {% for i in ingr_data %}
+                        <div class="ingredient-item" id="ingr-exist-{{ forloop.counter }}">
+                            <div class="ingredient-text">
+                                <div class="ingredient-bullet"></div>
+                                {{ i.item }}
+                            </div>
+                            <div class="ingredient-actions">
+                                <button type="button" onclick="removeIngredient('ingr-exist-{{ forloop.counter }}')"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Hidden inputs for form submission will be appended here -->
+                    <div id="hiddenIngredients">
+                        {% for i in ingr_data %}
+                        <input type="hidden" name="ingredients[]" value="{{ i.item }}" id="hidden-ingr-exist-{{ forloop.counter }}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="step-num">4</span> Cooking Steps
+                    </div>
+                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 15px;">Add the step-by-step instructions for your recipe</p>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <input type="text" class="form-control custom-input" id="stepInput"
+                            placeholder="e.g. Boil water in a large pot">
+                        <button type="button" class="btn-add-ingr" id="addStepBtn">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+
+                    <!-- Steps List Container -->
+                    <div id="stepsList">
+                        {% for s in cook_data %}
+                        <div class="ingredient-item" id="step-exist-{{ forloop.counter }}">
+                            <div class="ingredient-text">
+                                <div class="step-num" style="width: 24px; height: 24px; font-size: 12px; flex-shrink: 0;">{{ forloop.counter }}</div>
+                                {{ s.steps }}
+                            </div>
+                            <div class="ingredient-actions">
+                                <button type="button" onclick="removeStep('step-exist-{{ forloop.counter }}')"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Hidden inputs for form submission will be appended here -->
+                    <div id="hiddenSteps">
+                        {% for s in cook_data %}
+                        <input type="hidden" name="steps[]" value="{{ s.steps }}" id="hidden-step-exist-{{ forloop.counter }}">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div style="position: sticky; top: 100px;">
+                    <!-- Preview Card -->
+                    <div class="preview-card">
+                        <div class="card-heading">
+                            <i class="fa-regular fa-eye text-orange" style="color: var(--primary-orange);"></i> Recipe
+                            Preview
+                        </div>
+
+                        <div class="preview-img-container" id="side-preview-container">
+                            <i class="fa-regular fa-image placeholder-icon"></i>
+                            <p style="font-size: 12px;">Your dish photo will appear here</p>
+                            <img id="side-preview-img" src="{% if data.img %}{{ data.img.url }}{% endif %}" alt="Recipe Preview">
+                        </div>
+
+                        <div class="preview-details">
+                            <div class="preview-name" id="previewName">Recipe Name</div>
+                            <div class="preview-meta">
+                                <span id="previewCuisine"><i class="fa-solid fa-utensils"></i> Cuisine</span>
+                                <span id="previewPrep"><i class="fa-regular fa-clock"></i> Prep: -- min</span>
+                                <span id="previewCook"><i class="fa-regular fa-clock"></i> Cook: -- min</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips Card -->
+                    <div class="tips-card">
+                        <div class="card-heading">
+                            <i class="fa-regular fa-lightbulb text-orange" style="color: var(--primary-orange);"></i>
+                            Tips for a great recipe
+                        </div>
+                        <ul class="tips-list list-unstyled m-0">
+                            <li><i class="fa-regular fa-circle-check text-success"></i> Add a clear and attractive photo
+                            </li>
+                            <li><i class="fa-regular fa-circle-check text-success"></i> Be specific with ingredients
+                            </li>
+                            <li><i class="fa-regular fa-circle-check text-success"></i> Include preparation and cooking
+                                time</li>
+                            <li><i class="fa-regular fa-circle-check text-success"></i> Write clear cooking steps</li>
+                            <li><i class="fa-regular fa-circle-check text-success"></i> Share your special tips
+                                (optional)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Motivation Card -->
+                    <div class="motivation-card d-flex align-items-center gap-3">
+                        <div class="icon-circle-lg" style="overflow: hidden; padding: 0;">
+                            {% if request.user.bio.img %}
+                            <img src="{{ request.user.bio.img.url }}" alt="Profile"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_profile.jpg' %}"
+                                onerror="this.src='https://ui-avatars.com/api/?name={{request.user.username}}&background=random&size=200'"
+                                alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div
+                                style="font-weight: 700; font-size: 14px; color: var(--text-dark); margin-bottom: 2px;">
+                                Share your love for food!</div>
+                            <div style="font-size: 11px; color: #6b7280;">Your recipe might inspire someone today ❤️
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="/" class="btn-cancel text-center"
+                            style="flex: 1; display: flex; justify-content: center; align-items: center;">Cancel</a>
+                        <button type="submit" class="btn-publish justify-content-center" style="flex: 2;"><i
+                                class="fa-regular fa-paper-plane"></i> Save Changes</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live Preview Logic
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const hasImg = "{{ data.img|yesno:'true,false' }}" === "true";
+        if (hasImg) {
+            document.getElementById('upload-container').style.display = 'none';
+            document.getElementById('image-preview-wrapper').style.display = 'block';
+            document.getElementById('side-preview-img').style.display = 'block';
+            document.querySelectorAll('#side-preview-container .placeholder-icon, #side-preview-container p').forEach(el => el.style.display = 'none');
+        }
+        
+        // Init preview name
+        document.getElementById('previewName').textContent = '{{ data.name|escapejs }}' || 'Recipe Name';
+        document.getElementById('previewCuisine').innerHTML = '<i class="fa-solid fa-utensils"></i> {{ data.cuisine|escapejs }}';
+        document.getElementById('previewPrep').innerHTML = '<i class="fa-regular fa-clock"></i> Prep: {{ data.prep|escapejs }} min';
+        document.getElementById('previewCook').innerHTML = '<i class="fa-regular fa-clock"></i> Cook: {{ data.cook|escapejs }} min';
+
+        const nameInput = document.getElementById('inputName');
+        const cuisineInput = document.getElementById('inputCuisine');
+        const prepInput = document.getElementById('inputPrep');
+        const cookInput = document.getElementById('inputCook');
+        const imgInput = document.getElementById('img');
+
+        const prevName = document.getElementById('previewName');
+        const prevCuisine = document.getElementById('previewCuisine');
+        const prevPrep = document.getElementById('previewPrep');
+        const prevCook = document.getElementById('previewCook');
+
+        nameInput.addEventListener('input', (e) => {
+            prevName.textContent = e.target.value || 'Recipe Name';
+        });
+
+        cuisineInput.addEventListener('change', (e) => {
+            prevCuisine.innerHTML = `<i class="fa-solid fa-utensils"></i> ${e.target.value || 'Cuisine'}`;
+        });
+
+        prepInput.addEventListener('input', (e) => {
+            prevPrep.innerHTML = `<i class="fa-regular fa-clock"></i> Prep: ${e.target.value || '--'} min`;
+        });
+
+        cookInput.addEventListener('input', (e) => {
+            prevCook.innerHTML = `<i class="fa-regular fa-clock"></i> Cook: ${e.target.value || '--'} min`;
+        });
+
+        // Image Preview
+        const uploadContainer = document.getElementById('upload-container');
+        const previewWrapper = document.getElementById('image-preview-wrapper');
+        const previewImg = document.getElementById('image-preview-element');
+        const removeBtn = document.getElementById('remove-img-btn');
+        const sidePreviewImg = document.getElementById('side-preview-img');
+        const sidePreviewIcons = document.querySelectorAll('#side-preview-container .placeholder-icon, #side-preview-container p');
+
+        imgInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    sidePreviewImg.src = e.target.result;
+
+                    uploadContainer.style.display = 'none';
+                    previewWrapper.style.display = 'block';
+
+                    sidePreviewImg.style.display = 'block';
+                    sidePreviewIcons.forEach(el => el.style.display = 'none');
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        removeBtn.addEventListener('click', () => {
+            imgInput.value = '';
+            previewImg.src = '';
+            sidePreviewImg.src = '';
+
+            uploadContainer.style.display = 'block';
+            previewWrapper.style.display = 'none';
+
+            sidePreviewImg.style.display = 'none';
+            sidePreviewIcons.forEach(el => el.style.display = 'block');
+        });
+
+        // Ingredients Logic
+        const ingrInput = document.getElementById('ingredientInput');
+        const addIngrBtn = document.getElementById('addIngredientBtn');
+        const ingrList = document.getElementById('ingredientsList');
+        const hiddenIngr = document.getElementById('hiddenIngredients');
+
+        let ingredientCount = 0;
+
+        addIngrBtn.addEventListener('click', () => {
+            const val = ingrInput.value.trim();
+            if (val) {
+                ingredientCount++;
+                const id = `ingr-${ingredientCount}`;
+
+                // Add UI element
+                const div = document.createElement('div');
+                div.className = 'ingredient-item';
+                div.id = id;
+                div.innerHTML = `
+                        <div class="ingredient-text">
+                            <div class="ingredient-bullet"></div>
+                            ${val}
+                        </div>
+                        <div class="ingredient-actions">
+                            <button type="button" onclick="removeIngredient('${id}')"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    `;
+                ingrList.appendChild(div);
+
+                // Add hidden input for form submission
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'ingredients[]';
+                hidden.value = val;
+                hidden.id = `hidden-${id}`;
+                hiddenIngr.appendChild(hidden);
+
+                ingrInput.value = '';
+            }
+        });
+
+        // Allow Enter key to add ingredient
+        ingrInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addIngrBtn.click();
+            }
+        });
+    });
+
+    function removeIngredient(id) {
+        document.getElementById(id).remove();
+        document.getElementById(`hidden-${id}`).remove();
+    }
+
+    // Cooking Steps Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const stepInput = document.getElementById('stepInput');
+        const addStepBtn = document.getElementById('addStepBtn');
+        const stepsList = document.getElementById('stepsList');
+        const hiddenSteps = document.getElementById('hiddenSteps');
+
+        let stepCount = 0;
+
+        addStepBtn.addEventListener('click', () => {
+            const val = stepInput.value.trim();
+            if (val) {
+                stepCount++;
+                const id = `step-${stepCount}`;
+
+                // Add UI element
+                const div = document.createElement('div');
+                div.className = 'ingredient-item'; // Reusing style
+                div.id = id;
+                div.innerHTML = `
+                        <div class="ingredient-text">
+                            <div class="step-num" style="width: 24px; height: 24px; font-size: 12px; flex-shrink: 0;">${stepCount}</div>
+                            ${val}
+                        </div>
+                        <div class="ingredient-actions">
+                            <button type="button" onclick="removeStep('${id}')"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    `;
+                stepsList.appendChild(div);
+
+                // Add hidden input for form submission
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'steps[]';
+                hidden.value = val;
+                hidden.id = `hidden-${id}`;
+                hiddenSteps.appendChild(hidden);
+
+                stepInput.value = '';
+                stepInput.focus();
+            }
+        });
+
+        stepInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addStepBtn.click();
+            }
+        });
+    });
+
+    function removeStep(id) {
+        document.getElementById(id).remove();
+        document.getElementById(`hidden-${id}`).remove();
+        recalculateStepNumbers();
+    }
+
+    function recalculateStepNumbers() {
+        const stepsList = document.getElementById('stepsList');
+        const items = stepsList.querySelectorAll('.ingredient-item');
+        let stepCount = 0;
+        items.forEach((item) => {
+            stepCount++;
+            const numElement = item.querySelector('.step-num');
+            if(numElement) numElement.textContent = stepCount;
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/follow/')) {
+                    this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                } else if (href.startsWith('/unfollow/')) {
+                    this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+</script>
+
+{% endblock %}

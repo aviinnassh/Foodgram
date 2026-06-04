@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="view-transition" content="same-origin">
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Foodgram{% endblock %}</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@300;400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Common CSS Variables -->
+    <style>
+        :root {
+            --primary-orange: #f97316;
+            --primary-dark: #ea580c;
+            --light-orange: #ffedd5;
+            --bg-lightest: #fafafa;
+            --bg-card: #ffffff;
+            --text-dark: #1f2937;
+            --text-dim: #6b7280;
+            --border-light: #e5e7eb;
+            --radius-xl: 20px;
+            --radius-lg: 16px;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-lightest);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Modern Navbar (Light) */
+        .top-navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .nav-brand {
+            font-family: 'Rokkitt', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-orange);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-dark);
+            background: var(--bg-lightest);
+        }
+
+        .nav-links a.active {
+            background: var(--light-orange) !important;
+            color: var(--primary-orange) !important;
+            font-weight: 600;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .user-profile-circle {
+            width: 30px;
+            height: 30px;
+            background: var(--light-orange);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            transition: var(--transition);
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .user-profile-circle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Global Recipe Card Styles */
+        .recipe-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header-user {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-meta img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-card-more {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .card-img-wrap {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-item {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-item a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-item i.fa-heart {
+            color: #ef4444;
+        }
+
+        .stat-item a.link-feedbacks {
+            color: var(--primary-orange);
+            font-weight: 500;
+        }
+
+        .card-content h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 15px;
+            color: var(--text-dark);
+            flex-grow: 1;
+        }
+
+        .recipe-info-line {
+            color: var(--text-dim);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .recipe-info-line i {
+            color: #9ca3af;
+        }
+
+        .recipe-info-line strong {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .card-footer-btns {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px 20px;
+        }
+
+        .btn-recipe {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-recipe-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-recipe-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-recipe-secondary {
+            background: var(--light-orange);
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-recipe-secondary:hover {
+            background: #ffe4cc;
+        }
+
+        .recipe-expanded-content {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css">
+    <style>
+        /* Custom Pace.js Theme for Foodgram */
+        .pace {
+            -webkit-pointer-events: none;
+            pointer-events: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        .pace-inactive {
+            display: none;
+        }
+
+        .pace .pace-progress {
+            background: var(--primary-orange);
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            right: 100%;
+            width: 100%;
+            height: 3px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-navbar">
+        <a href="/" class="nav-brand">
+            <img src="{% static 'images/logo.png' %}" alt="Foodgram Logo" style="height: 75px; width: auto;">
+        </a>
+
+        <div class="nav-links">
+            <a href="/" class="{% if request.path == '/' or request.path == '/userHome' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+            <a href="/explore" class="{% if '/explore' in request.path %}active{% endif %}">
+                <i class="fa-regular fa-compass"></i> Explore
+            </a>
+            <a href="/addRecipe" class="{% if '/addRecipe' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-plus"></i> Add Recipe
+            </a>
+            <a href="/notifications" class="{% if '/notifications' in request.path %}active{% endif %}"
+                style="position: relative;">
+                <i class="fa-regular fa-bell"></i> Notifications
+                {% if unread_count and unread_count > 0 %}
+                <span class="badge"
+                    style="background: var(--primary-orange); position: absolute; top: 5px; right: 5px; font-size: 10px; border-radius: 50%;">{{ unread_count }}</span>
+                {% endif %}
+            </a>
+            <a href="/profile" class="{% if '/profile' in request.path %}active{% endif %}">
+                <i class="fa-regular fa-user"></i> Profile
+            </a>
+        </div>
+
+        <div class="nav-right">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/profile" class="user-profile-circle">
+                    <img src="{% if request.user.is_authenticated %}{{ request.user.bio.img.url }}{% else %}https://ui-avatars.com/api/?name=Guest&background=f97316&color=fff{% endif %}"
+                        alt="User" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a href="/profile" style="text-decoration: none;">
+                    <span class="user-name" style="font-weight: 600; color: var(--text-dark); font-size: 16px; font-family: 'Poppins', sans-serif;">
+                        {% if request.user.is_authenticated %}
+                            {{ request.user.first_name }}
+                        {% else %}
+                            Guest
+                        {% endif %}
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+    <!-- Pull-to-Refresh Indicator -->
+    <div id="ptr-indicator" style="position: fixed; top: -60px; left: 0; right: 0; text-align: center; height: 60px; line-height: 60px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); color: var(--primary-orange); font-weight: 600; z-index: 9999; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-size: 15px; border-bottom: 1px solid var(--border-light);">
+        <i class="fa-solid fa-spinner fa-spin me-2"></i> Fetching new recipes...
+    </div>
+
+    <!-- Common Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Instant Page Preloader (speeds up navigation) -->
+    <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZCGo0Jm5S9DZiZ2h2I1Omt0k0E8iItqHqWeI7XkR5M21E62vFfX1vUu8S9TqS8"></script>
+
+    <script>
+        // Scroll/Pull to refresh logic (like Instagram)
+        let touchstartY = 0;
+        let isRefreshing = false;
+
+        // Mobile touch
+        document.addEventListener('touchstart', e => {
+            if (window.scrollY === 0) {
+                touchstartY = e.changedTouches[0].screenY;
+            }
+        }, {passive: true});
+        
+        document.addEventListener('touchend', e => {
+            if (window.scrollY === 0 && !isRefreshing) {
+                let touchendY = e.changedTouches[0].screenY;
+                if (touchendY > touchstartY + 150) {
+                    triggerRefresh();
+                }
+            }
+        }, {passive: true});
+
+        // Desktop mouse wheel at the top
+        window.addEventListener('wheel', (e) => {
+            if (window.scrollY === 0 && e.deltaY < -100 && !isRefreshing) {
+                triggerRefresh();
+            }
+        }, {passive: true});
+
+        function triggerRefresh() {
+            isRefreshing = true;
+            const ptr = document.getElementById('ptr-indicator');
+            if(ptr) {
+                ptr.style.top = '0'; // Show indicator
+                
+                // Fetch fresh content via AJAX
+                fetch(window.location.href, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.text())
+                .then(html => {
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(html, 'text/html');
+                    
+                    let newFeed = doc.getElementById('recipe-feed-container');
+                    if (newFeed) {
+                        document.getElementById('recipe-feed-container').innerHTML = newFeed.innerHTML;
+                    }
+                    
+                    let newAiRec = doc.getElementById('ai-recommended-container');
+                    let oldAiRec = document.getElementById('ai-recommended-container');
+                    if (newAiRec && oldAiRec) {
+                        oldAiRec.innerHTML = newAiRec.innerHTML;
+                    }
+                    
+                    let newTrigger = doc.getElementById('infinite-scroll-trigger');
+                    let oldTrigger = document.getElementById('infinite-scroll-trigger');
+                    if (oldTrigger && newTrigger) {
+                        oldTrigger.setAttribute('data-url', newTrigger.getAttribute('data-url'));
+                    } else if (oldTrigger && !newTrigger) {
+                        oldTrigger.remove();
+                    }
+                    
+                    // Hide indicator smoothly
+                    setTimeout(() => {
+                        ptr.style.top = '-60px';
+                        isRefreshing = false;
+                    }, 500);
+                })
+                .catch(() => {
+                    window.location.reload(); // fallback
+                });
+            }
+        }
+        // Infinite Scroll Logic
+        document.addEventListener("DOMContentLoaded", function() {
+            let trigger = document.getElementById('infinite-scroll-trigger');
+            if(trigger) {
+                let observer = new IntersectionObserver(function(entries) {
+                    if(entries[0].isIntersecting && !trigger.classList.contains('loading')) {
+                        trigger.classList.add('loading');
+                        let url = trigger.getAttribute('data-url');
+                        let currentUrl = new URL(window.location.href);
+                        
+                        // Safely extract page number
+                        let pageMatch = url.match(/page=(\d+)/);
+                        if (pageMatch) {
+                            currentUrl.searchParams.set('page', pageMatch[1]);
+                        } else {
+                            // Fallback
+                            currentUrl = new URL(url, window.location.href);
+                        }
+                        
+                        fetch(currentUrl.toString(), {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(res => res.text())
+                        .then(html => {
+                            let parser = new DOMParser();
+                            let doc = parser.parseFromString(html, 'text/html');
+                            
+                            let newItems = doc.getElementById('recipe-feed-container');
+                            if (newItems) {
+                                document.getElementById('recipe-feed-container').insertAdjacentHTML('beforeend', newItems.innerHTML);
+                            }
+                            
+                            let newTrigger = doc.getElementById('infinite-scroll-trigger');
+                            if(newTrigger) {
+                                trigger.setAttribute('data-url', newTrigger.getAttribute('data-url'));
+                                trigger.classList.remove('loading');
+                            } else {
+                                trigger.remove();
+                            }
+                        });
+                    }
+                }, { rootMargin: '200px' });
+                observer.observe(trigger);
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

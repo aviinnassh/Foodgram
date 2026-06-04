@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Feedbacks - Foodgram{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feedback-page {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Dish Context Header */
+    .dish-context {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-light);
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .dish-context-img {
+        width: 120px;
+        height: 120px;
+        border-radius: var(--radius-lg);
+        object-fit: cover;
+    }
+
+    .dish-context-info h2 {
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 24px;
+        color: var(--text-dark);
+    }
+
+    .dish-context-info p {
+        color: var(--text-dim);
+        margin: 0;
+        font-size: 14px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .dish-context-info a {
+        color: var(--primary-orange);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    /* Feedbacks List */
+    .feedbacks-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-light);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .feedbacks-header {
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-dark);
+    }
+
+    .feedbacks-header i {
+        color: var(--primary-orange);
+    }
+
+    .feedback-card {
+        padding: 20px;
+        border-radius: 12px;
+        background: var(--bg-lightest);
+        margin-bottom: 15px;
+        border: 1px solid var(--border-light);
+        display: flex;
+        gap: 15px;
+    }
+
+    .feedback-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--primary-orange);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .feedback-content {
+        flex: 1;
+    }
+
+    .feedback-author {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-dark);
+    }
+
+    .feedback-text {
+        color: var(--text-dark);
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.6;
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+    }
+
+    /* Form */
+    .feedback-form-container {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-light);
+        padding: 30px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid var(--border-light);
+        resize: none;
+        margin-bottom: 15px;
+        background: var(--bg-lightest);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        background: white;
+    }
+
+    .btn-submit-feedback {
+        background: var(--primary-orange);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .btn-submit-feedback:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-dim);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feedback-page slide-up">
+    <!-- Dish Context Header -->
+    <div class="dish-context">
+        <img src="{% if dish.img %}{{ dish.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60{% endif %}" alt="{{ dish.name }}" class="dish-context-img">
+        <div class="dish-context-info">
+            <h2>{{ dish.name }}</h2>
+            <p>
+                <span><i class="fa-solid fa-user me-2"></i> <a href="/viewUser/{{ dish.user.pk }}">{% if dish.user.username == 'admin' %}Chef AI{% else %}{{ dish.user.first_name|default:dish.user.username }}{% endif %}</a></span>
+                <span><i class="fa-solid fa-utensils me-2"></i> {{ dish.cuisine }}</span>
+                <span><i class="fa-solid fa-clock me-2"></i> {{ dish.cook }} mins</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Feedbacks List -->
+        <div class="col-lg-8 mb-4">
+            <div class="feedbacks-section">
+                <div class="feedbacks-header" style="justify-content: space-between;">
+                    <div><i class="fa-regular fa-comments"></i> Feedbacks ({{ data|length }})</div>
+                    <a href="/dish/{{dish.pk}}" class="btn btn-light" style="border-radius: 50px; font-size: 14px; font-weight: 600; color: var(--text-dim); border: 1px solid var(--border-light);">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Dish
+                    </a>
+                </div>
+
+                {% if data %}
+                    <div class="feedbacks-list">
+                        {% for i in data %}
+                        <div class="feedback-card">
+                            {% if i.user.bio.img %}
+                            <img src="{{ i.user.bio.img.url }}" class="feedback-avatar" alt="Avatar">
+                            {% else %}
+                            <div class="feedback-avatar">
+                                {{ i.user.first_name|slice:":1"|default:i.user.username|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="feedback-content">
+                                <div class="feedback-author">
+                                    <span>{% if i.user.username == 'admin' %}Chef AI{% else %}{{ i.user.first_name|default:i.user.username }}{% endif %}</span>
+                                </div>
+                                <div class="feedback-text">{{ i.ratings }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-regular fa-comment-dots mb-3" style="font-size: 48px; color: #cbd5e1;"></i>
+                        <h5>No feedbacks yet!</h5>
+                        <p>Be the first to share your thoughts on this recipe.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="col-lg-4">
+            <div class="feedback-form-container" style="position: sticky; top: 100px;">
+                <h5 class="fw-bold mb-3" style="color: var(--text-dark);">Leave Feedback</h5>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <textarea name="rating" class="form-control" rows="5" placeholder="What did you think of this recipe? Was it delicious?" required></textarea>
+                    <button type="submit" class="btn-submit-feedback">
+                        <i class="fa-solid fa-paper-plane me-2"></i> Submit Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

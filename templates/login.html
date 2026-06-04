@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="view-transition" content="same-origin">
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}?v=2.7">
+</head>
+
+<body>
+
+    <div class="container right-panel-active" id="container">
+        <!-- Sign Up Form -->
+        <div class="form-container sign-up-container">
+            <form action="{% url 'shop_login' %}" method="post" id="registerForm">
+                {% csrf_token %}
+                <h1>Create <span>Account</span></h1>
+
+                <div class="input-group-custom">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" name="name" placeholder="Full Name" required />
+                </div>
+                <div class="input-group-custom">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email Address" required />
+                </div>
+                <div class="input-group-custom">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="passwd" placeholder="Password" id="pass" required />
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword('pass')"></i>
+                </div>
+                <div class="input-group-custom">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="cpasswd" placeholder="Confirm Password" id="cpass" required />
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword('cpass')"></i>
+                </div>
+
+                <ul class="req">
+                    <li id="len"><i class="fa-solid fa-check"></i> Min 8 characters</li>
+                    <li id="dig"><i class="fa-solid fa-check"></i> Min 1 number</li>
+                    <li id="cap"><i class="fa-solid fa-check"></i> Min 1 uppercase letter</li>
+                    <li id="char"><i class="fa-solid fa-check"></i> Min 1 special character</li>
+                    <li id="sml"><i class="fa-solid fa-check"></i> Min 1 small letter</li>
+                </ul>
+
+                <button type="submit">Sign Up &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+                <div class="already-account">Already have an account? <span class="link-text" id="signInLink">Sign
+                        in</span></div>
+            </form>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="form-container sign-in-container">
+            <form method="POST" action="{% url 'shop_login' %}" id="signInForm">
+                {% csrf_token %}
+                <h1>Sign <span>In</span></h1>
+                <div class="input-group-custom">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" name="uname" placeholder="Username" required />
+                </div>
+                <div class="input-group-custom">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="passwd" id="loginPass" placeholder="Password" required />
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword('loginPass')"></i>
+                </div>
+                <button type="submit">Sign In &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+                <div class="already-account">Don't have an account? <span class="link-text" id="signUpLink">Sign
+                        up</span></div>
+            </form>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <!-- Left Overlay (Shown when signing up) -->
+                <div class="overlay-panel overlay-left">
+                    <img src="{% static 'images/logo.png' %}" alt="Icon" class="overlay-icon"
+                        style="width: 140px;">
+                    <h1>Welcome <span>Back!</span></h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+                <!-- Right Overlay (Shown when signing in) -->
+                <div class="overlay-panel overlay-right">
+                    <img src="{% static 'images/logo.png' %}" alt="Icon" class="overlay-icon"
+                        style="width: 140px;">
+                    <h1>Hello, <span>Friend!</span></h1>
+                    <p>Enter your personal details and start journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div style="position: absolute; top: 20px; z-index: 9999; width: 100%; display: flex; justify-content: center;">
+        <div>
+            {% for message in messages %}
+            <div class="alert alert-warning alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{% static 'js/reg.js' %}"></script>
+
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Add event listeners for the link-text toggles
+        document.getElementById('signInLink').addEventListener('click', () => {
+            document.getElementById('container').classList.remove("right-panel-active");
+        });
+        document.getElementById('signUpLink').addEventListener('click', () => {
+            document.getElementById('container').classList.add("right-panel-active");
+        });
+    </script>
+</body>
+
+</html>

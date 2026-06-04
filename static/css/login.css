@@ -1,0 +1,456 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    background: url('../images/login_bg_enhanced.png') no-repeat center center fixed;
+    background-size: 115% 115%;
+    background-color: #fdf5ef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    margin: 0;
+    animation: panBackground 35s linear infinite alternate;
+}
+
+@keyframes panBackground {
+    0% {
+        background-position: left top;
+    }
+    50% {
+        background-position: right bottom;
+    }
+    100% {
+        background-position: left bottom;
+    }
+}
+
+/* Fallback if user uses a custom background image named login_bg.jpg */
+/* body { background: url('../images/login_bg.jpg') center/cover no-repeat; } */
+
+h1 {
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: #1a1a1a;
+}
+
+h1 span {
+    color: #ff5722;
+}
+
+p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+button {
+    border-radius: 50px;
+    border: 1px solid #ff5722;
+    background: linear-gradient(to right, #ff5722, #ff7b00);
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in, box-shadow 0.3s ease;
+    margin-top: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button:focus {
+    outline: none;
+}
+
+button.ghost {
+    background: transparent;
+    border-color: #ff5722;
+    color: #ff5722;
+    box-shadow: none;
+}
+
+button.ghost:hover {
+    background: #ff5722;
+    color: #fff;
+}
+
+form {
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+.input-group-custom {
+    position: relative;
+    width: 100%;
+    margin: 8px 0;
+}
+
+.input-group-custom i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0a0a0;
+}
+
+.input-group-custom i.toggle-password {
+    left: auto;
+    right: 15px;
+    cursor: pointer;
+}
+
+input {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 15px 12px 40px;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    transition: border 0.3s;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff5722;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    width: 900px;
+    max-width: 100%;
+    min-height: 600px;
+    animation: smoothFadeIn 0.8s ease-out forwards, glowPulse 4s infinite alternate 0.8s;
+}
+
+/* Sweeping light reflection effect */
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-25deg);
+    animation: sweepLight 12s infinite; /* Sweeps every 12 seconds */
+    pointer-events: none;
+    z-index: 999;
+}
+
+@keyframes smoothFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+        box-shadow: 0 0px 0px rgba(255, 87, 34, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: 0 15px 35px rgba(255, 87, 34, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 15px 35px rgba(255, 87, 34, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    100% {
+        box-shadow: 0 20px 60px rgba(255, 87, 34, 0.4), 0 10px 20px rgba(255, 87, 34, 0.2);
+    }
+}
+
+@keyframes sweepLight {
+    0% { left: -150%; }
+    40% { left: 250%; }
+    100% { left: 250%; }
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+}
+
+@keyframes show {
+
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.overlay {
+    background: #151515;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel h1 {
+    color: #fff;
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+.container.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+/* Checklist requirements styling */
+#registerForm .req {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 15px;
+    padding: 0;
+    margin: 15px 0 10px 0;
+    font-size: 11px;
+    list-style-type: none;
+    text-align: left;
+    width: 100%;
+}
+
+#registerForm .req li {
+    display: flex;
+    align-items: center;
+    color: #a0a0a0;
+    /* Default color */
+    width: calc(50% - 10px);
+}
+
+#registerForm .req li i {
+    margin-right: 5px;
+}
+
+/* Icon for dark overlay */
+.overlay-icon {
+    width: 80px;
+    margin-bottom: 20px;
+}
+
+/* Existing utility classes */
+.spacing {
+    margin-bottom: 3vh;
+}
+
+.alert {
+    width: auto;
+    max-width: 100%;
+    margin-top: 3vh;
+    padding: 10px;
+}
+
+.btn-close {
+    margin: 0;
+}
+
+.already-account {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.already-account a,
+.already-account span.link-text {
+    color: #ff5722;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 890px) {
+    .container {
+        width: 85vw;
+        min-height: 500px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .container {
+        width: 90vw;
+        min-height: 650px;
+        flex-direction: column;
+    }
+
+    .form-container {
+        width: 100%;
+        height: 60%;
+    }
+
+    .sign-in-container {
+        width: 100%;
+    }
+
+    .container.right-panel-active .sign-in-container {
+        transform: translateY(100%);
+    }
+
+    .sign-up-container {
+        width: 100%;
+    }
+
+    .container.right-panel-active .sign-up-container {
+        transform: translateY(0);
+    }
+
+    .overlay-container {
+        top: 60%;
+        left: 0;
+        width: 100%;
+        height: 40%;
+    }
+
+    .container.right-panel-active .overlay-container {
+        transform: translateY(-150%);
+    }
+
+    .overlay {
+        width: 100%;
+        height: 200%;
+        left: 0;
+        top: -100%;
+    }
+
+    .container.right-panel-active .overlay {
+        transform: translateY(50%);
+    }
+
+    .overlay-panel {
+        width: 100%;
+        height: 50%;
+        padding: 0 20px;
+    }
+
+    .overlay-left {
+        top: 0;
+        transform: translateY(-20%);
+    }
+
+    .container.right-panel-active .overlay-left {
+        transform: translateY(0);
+    }
+
+    .overlay-right {
+        top: 50%;
+        transform: translateY(0);
+    }
+
+    .container.right-panel-active .overlay-right {
+        transform: translateY(20%);
+    }
+
+    form {
+        padding: 0 20px;
+    }
+}

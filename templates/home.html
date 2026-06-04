@@ -1,0 +1,967 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Foodgram{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Light Hero Banner */
+    .hero-banner {
+        background: linear-gradient(135deg, #fffaf5 0%, #fff3e6 100%);
+        border-radius: var(--radius-xl);
+        margin: 30px 80px 60px;
+        padding: 60px 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid rgba(249, 115, 22, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        max-width: 550px;
+        z-index: 1;
+    }
+
+    .hero-content h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 42px;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+
+    .hero-content h1 span {
+        color: var(--primary-orange);
+    }
+
+    .hero-content p {
+        color: #4b5563;
+        font-size: 18px;
+        margin-bottom: 40px;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .hero-search-bar {
+        background: white;
+        padding: 10px 12px 10px 30px;
+        border-radius: 60px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        max-width: 550px;
+        border: 1px solid var(--border-light);
+    }
+
+    .hero-search-bar input {
+        border: none;
+        outline: none;
+        flex-grow: 1;
+        font-size: 16px;
+        background: transparent;
+        color: var(--text-dark);
+    }
+
+    .hero-search-bar input::placeholder {
+        color: #9ca3af;
+    }
+
+    .hero-search-bar i {
+        color: #9ca3af;
+        margin-right: 15px;
+        font-size: 18px;
+    }
+
+    .btn-hero-search {
+        background: var(--primary-orange);
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-hero-search:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .hero-image-wrap {
+        width: 400px;
+        height: 400px;
+        z-index: 1;
+    }
+
+    .hero-image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+    }
+
+    /* Main Container Layout */
+    .page-container {
+        padding: 0 80px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 40px;
+    }
+
+    /* Section Header */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0;
+        position: relative;
+        padding-bottom: 8px;
+        color: var(--text-dark);
+    }
+
+    .section-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 4px;
+        background: var(--primary-orange);
+        border-radius: 2px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .sort-btn {
+        background: white;
+        border: 1px solid var(--border-light);
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .view-toggles {
+        display: flex;
+        gap: 8px;
+    }
+
+    .view-icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-light);
+        background: white;
+        color: var(--text-dim);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .view-icon-btn.active {
+        background: var(--primary-orange);
+        color: white;
+        border-color: var(--primary-orange);
+    }
+
+    /* Recipe Card (New Match to PNG) */
+    .recipe-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: var(--transition);
+        box-shadow: var(--shadow-light);
+    }
+
+    .recipe-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header-user {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .user-meta img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .btn-card-more {
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+    }
+
+    .card-img-wrap {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-content {
+        padding: 15px 20px;
+    }
+
+    .card-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .stat-item {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-item a {
+        color: var(--text-dark);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .stat-item i.fa-heart {
+        color: #ef4444;
+        /* Red heart */
+    }
+
+    .stat-item a.link-feedbacks {
+        color: var(--primary-orange);
+        font-weight: 500;
+    }
+
+    .card-content h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0 0 15px;
+        color: var(--text-dark);
+    }
+
+    .recipe-info-line {
+        color: var(--text-dim);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .recipe-info-line i {
+        color: #9ca3af;
+    }
+
+    .recipe-info-line strong {
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .card-footer-btns {
+        display: flex;
+        gap: 12px;
+        padding: 0 20px 20px;
+    }
+
+    .btn-recipe {
+        flex: 1;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 13px;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-recipe-primary {
+        background: var(--primary-orange);
+        color: white;
+    }
+
+    .btn-recipe-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-recipe-secondary {
+        background: var(--light-orange);
+        color: var(--primary-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-recipe-secondary:hover {
+        background: #ffe4cc;
+    }
+
+    .recipe-expanded-content {
+        display: none;
+        padding: 20px;
+        border-top: 1px solid var(--border-light);
+    }
+
+    /* AI Sidebar - Match to PNG */
+    .exact-ai-sidebar {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+        padding: 25px;
+        position: sticky;
+        top: 100px;
+        box-shadow: var(--shadow-light);
+    }
+
+    .ai-title-block {
+        margin-bottom: 20px;
+    }
+
+    .ai-title-block h3 {
+        color: var(--primary-orange);
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ai-title-block p {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .ai-rec-card-sm {
+        display: flex;
+        gap: 15px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 12px;
+        transition: var(--transition);
+    }
+
+    .ai-rec-card-sm:hover {
+        border-color: #fbd38d;
+        background: #fffaf5;
+    }
+
+    .ai-thumb-sm {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .ai-info-sm {
+        flex-grow: 1;
+    }
+
+    .ai-info-sm h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        color: var(--text-dark);
+        line-height: 1.2;
+    }
+
+    .ai-info-sm p {
+        font-size: 12px;
+        color: var(--text-dim);
+        margin: 0 0 6px;
+    }
+
+    .ai-info-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ai-likes-sm {
+        font-size: 12px;
+        color: var(--text-dark);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .ai-likes-sm i {
+        color: #ef4444;
+    }
+
+    .btn-view-ai-sm {
+        background: var(--light-orange);
+        color: var(--primary-orange);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        transition: var(--transition);
+    }
+
+    .btn-view-ai-sm:hover {
+        background: #ffe4cc;
+    }
+
+    .btn-get-more-ai {
+        width: 100%;
+        background: white;
+        border: 1px solid var(--primary-orange);
+        color: var(--primary-orange);
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-get-more-ai:hover {
+        background: var(--light-orange);
+    }
+
+    /* Popular Categories - Exact Look */
+    .categories-wide-section {
+        padding: 20px 80px 80px;
+    }
+
+    .cat-grid-exact {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+    }
+
+    .cat-card-exact {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        transition: var(--transition);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .cat-card-exact:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-light);
+    }
+
+    .cat-icon-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--text-dark);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .cat-info-exact h4 {
+        margin: 0 0 2px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .cat-info-exact p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    /* Specific Colors for Categories */
+    .bg-cat-beige {
+        background: #fff8ec;
+    }
+
+    .bg-cat-green {
+        background: #ecfdf5;
+    }
+
+    .bg-cat-purple {
+        background: #f5f3ff;
+    }
+
+    .bg-cat-pink {
+        background: #fdf2f8;
+    }
+
+    .bg-cat-blue {
+        background: #f0f9ff;
+    }
+
+    @media (max-width: 1200px) {
+        .page-container {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-image-wrap {
+            display: none;
+        }
+
+        .cat-grid-exact {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-banner"
+    style="background: linear-gradient(135deg, #fffaf5 0%, #fff3e6 100%); margin: 30px 80px 40px; padding: 30px 50px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative;">
+    <div class="hero-content" style="max-width: 50%; z-index: 1;">
+        <h1 style="font-size: 42px; font-weight: 800; line-height: 1.1; margin-bottom: 15px; color: var(--text-dark);">
+            Discover Delicious <br /><span style="color: var(--primary-orange);">Recipes</span> <i
+                class="fa-solid fa-hat-chef text-warning opacity-50" style="font-size: 40px;"></i></h1>
+        <p style="color: var(--text-dim); font-size: 16px; margin-bottom: 20px; max-width: 90%;">Cook, share, and
+            explore food from around the world.</p>
+
+        <div class="hero-image-search-block"
+            style="margin-top: 20px; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: stretch; width: 100%; border: 1px solid var(--border-light);">
+            <div class="left-section"
+                style="width: 50%; padding-right: 20px; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; justify-content: center;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div
+                        style="background: #fff0e6; color: var(--primary-orange); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <h3 style="font-size: 15px; font-weight: 700; margin: 0; color: var(--text-dark);">Find Recipes
+                        from Image ✨</h3>
+                </div>
+                <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.4;">
+                    Upload a food image and get similar recipe suggestions instantly using AI.
+                </p>
+                <div>
+                    <button id="imageSearchBtn" onclick="document.getElementById('foodImageInput').click();" class="btn"
+                        style="background: var(--primary-orange); color: white; font-weight: 600; font-size: 13px; padding: 8px 24px; border-radius: 8px; transition: all 0.3s ease;">
+                        Try Now ✨
+                    </button>
+                </div>
+            </div>
+
+            <div class="right-section" style="width: 50%; padding-left: 20px;">
+                <div class="upload-zone" onclick="document.getElementById('foodImageInput').click();"
+                    style="border: 1px dashed var(--primary-orange); border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; background: #fffaf5; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                    <i id="uploadIcon" class="fa-solid fa-cloud-arrow-up"
+                        style="font-size: 28px; color: var(--primary-orange);"></i>
+                    <p id="uploadText" style="font-size: 12px; color: var(--text-dark); font-weight: 500; margin: 0;">
+                        Drag & drop
+                        or click to upload</p>
+                    <p style="font-size: 10px; color: var(--text-dim); margin: 0;">JPG, PNG up to 5MB</p>
+                </div>
+            </div>
+        </div>
+
+
+        <form action="/image_search/" method="POST" enctype="multipart/form-data" id="imageSearchForm"
+            style="display: none;">
+            {% csrf_token %}
+            <input type="file" name="food_image" id="foodImageInput" accept="image/jpeg, image/png">
+        </form>
+    </div>
+
+    <div class="hero-image-wrap"
+        style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 450px; height: 450px; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 2; border-radius: 0;">
+        <img id="heroFoodImg" src="{% static 'images/hero1.png' %}" alt="Delicious Food"
+            style="width: 100%; height: 100%; object-fit: cover; border-radius: 0; transition: all 1.5s ease-in-out; transform: scale(1); opacity: 1;">
+    </div>
+</div>
+
+<!-- Main Content Layout -->
+<div class="container-fluid px-5" style="padding: 0 80px !important;">
+    <div class="row gx-5">
+        <!-- Left Column: Categories & Latest Recipes -->
+        <div class="col-lg-8 col-xl-8">
+
+            <!-- Latest Recipes Section -->
+            <div class="recipe-feed mb-5">
+                <div class="section-header mb-3">
+                    <h2 style="font-size: 22px; font-weight: 700; margin: 0; color: var(--text-dark);">Latest Recipes
+                    </h2>
+                </div>
+
+                <div class="row g-4" id="recipe-feed-container">
+                    {% for i in dish %}
+                    <div class="col-md-6 col-lg-6">
+                        {% include 'post_card.html' %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if dish_page.has_next %}
+                <div id="infinite-scroll-trigger" data-url="?page={{ dish_page.next_page_number }}"
+                    style="text-align: center; padding: 20px;">
+                    <i class="fa-solid fa-spinner fa-spin text-warning" style="font-size: 24px;"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Popular Categories -->
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: var(--text-dark);">Popular
+                        Categories</h2>
+                    <a href="/explore"
+                        style="color: var(--primary-orange); font-size: 14px; font-weight: 600; text-decoration: none;">View
+                        All Categories <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="row g-3">
+                    <div class="col">
+                        <a href="/explore?q=breakfast"
+                            class="d-flex align-items-center gap-3 text-decoration-none p-3 rounded-4"
+                            style="background: #fff8ec; border: 1px solid rgba(0,0,0,0.02);">
+                            <div
+                                style="background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <i class="fa-solid fa-mug-hot" style="color: #8b5cf6;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-dark);">
+                                    Breakfast</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">{{ breakfast_count|default:"0" }} Recipes</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/explore?q=lunch"
+                            class="d-flex align-items-center gap-3 text-decoration-none p-3 rounded-4"
+                            style="background: #ecfdf5; border: 1px solid rgba(0,0,0,0.02);">
+                            <div
+                                style="background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <i class="fa-solid fa-utensils" style="color: #10b981;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-dark);">
+                                    Lunch</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">{{ lunch_count|default:"0" }} Recipes</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/explore?q=dinner"
+                            class="d-flex align-items-center gap-3 text-decoration-none p-3 rounded-4"
+                            style="background: #f5f3ff; border: 1px solid rgba(0,0,0,0.02);">
+                            <div
+                                style="background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <i class="fa-solid fa-bell-concierge" style="color: #6366f1;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-dark);">
+                                    Dinner</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">{{ dinner_count|default:"0" }} Recipes</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/explore?q=dessert"
+                            class="d-flex align-items-center gap-3 text-decoration-none p-3 rounded-4"
+                            style="background: #fdf2f8; border: 1px solid rgba(0,0,0,0.02);">
+                            <div
+                                style="background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <i class="fa-solid fa-cake-candles" style="color: #ec4899;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-dark);">
+                                    Desserts</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">{{ desserts_count|default:"0" }} Recipes</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/explore?q=healthy"
+                            class="d-flex align-items-center gap-3 text-decoration-none p-3 rounded-4"
+                            style="background: #f0fdf4; border: 1px solid rgba(0,0,0,0.02);">
+                            <div
+                                style="background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <i class="fa-solid fa-leaf" style="color: #059669;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-dark);">
+                                    Healthy</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">{{ healthy_count|default:"0" }} Recipes</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End Left Column col-lg-8 -->
+
+        <!-- Right Column: AI Sidebar -->
+        <div class="col-lg-4 col-xl-4">
+            <div class="sidebar-column" style="position: sticky; top: 120px; z-index: 10;">
+
+                <div class="exact-ai-sidebar mb-4"
+                    style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 25px;">
+                    <div class="ai-title-block">
+                        <h3
+                            style="color: var(--primary-orange); font-size: 18px; font-weight: 700; margin-bottom: 8px;">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 18px; margin-right: 8px;"></i>
+                            AI Recommended For You
+                        </h3>
+                        <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 25px;">Personalized
+                            recipe suggestions just for you</p>
+                    </div>
+
+                    <div id="ai-recommended-container">
+                        {% for r in recommended_dishes|slice:":4" %}
+                        <div class="ai-rec-card-sm"
+                            style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: white; border: 1px solid #fed7aa; border-radius: 12px; margin-bottom: 12px; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(249, 115, 22, 0.08);">
+
+                            <img src="{% if r.img %}{{ r.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80{% endif %}"
+                                alt="{{ r.name }}"
+                                style="width: 58px; height: 58px; border-radius: 8px; object-fit: cover;">
+                            <div class="ai-info-sm" style="flex-grow: 1;">
+                                <h4
+                                    style="font-size: 14px; font-weight: 700; margin: 0 0 4px; color: var(--primary-orange); line-height: 1.25;">
+                                    {{r.name|truncatechars:32}}</h4>
+                                <div class="d-flex align-items-center gap-2"
+                                    style="color: var(--text-dim); font-size: 12px; margin-bottom: 3px;">
+                                    <span>{{r.category|default:"Various"}}</span>
+                                    <span>&bull;</span>
+                                    <span>{{r.cook}} min</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1"
+                                    style="color: var(--text-dim); font-size: 12px;">
+                                    <i class="fa-solid fa-heart" style="color: #ff4b4b;"></i> <span>{{r.likes}}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <a href="/dish/{{r.pk}}"
+                                    style="background: var(--primary-orange); color: white; border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s;">View</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <a href="/recommend/{{ latest_liked_id }}?from_sidebar=1" class="btn-get-more-ai"
+                        style="text-decoration: none; width: 100%; display: block; text-align: center; border: 1px solid var(--primary-orange); color: var(--primary-orange); padding: 12px; border-radius: 12px; font-weight: 600; font-size: 15px; margin-top: 5px; background: white; transition: all 0.2s;">
+                        🤖 Get More Recommendations
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle Recipe Expanded Content
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('toggle-recipe-btn')) {
+            e.preventDefault();
+            const card = e.target.closest('.recipe-card');
+            if (card) {
+                const content = card.querySelector('.recipe-expanded-content');
+                if (content) {
+                    content.classList.toggle('show');
+                    // Use !important in case Bootstrap's .show is not strong enough
+                    if (content.classList.contains('show')) {
+                        content.style.display = 'block';
+                        e.target.innerText = 'Hide Recipe';
+                    } else {
+                        content.style.display = 'none';
+                        e.target.innerText = 'View Recipe';
+                    }
+                }
+            }
+        }
+    });
+
+    // AI Button Animation
+    document.querySelectorAll(".ai-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            this.innerHTML = '<i class="fa-solid fa-robot fa-spin me-2"></i> Thinking...';
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/follow/')) {
+                    this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                } else if (href.startsWith('/unfollow/')) {
+                    this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+</script>
+<script>
+    // Image Search Flow Logic
+    document.getElementById('foodImageInput').addEventListener('change', function (e) {
+        if (this.files && this.files.length > 0) {
+            const fileName = this.files[0].name;
+
+            // Update the upload zone UI
+            document.getElementById('uploadText').innerHTML = `<strong style="color: var(--primary-orange);">Selected:</strong> ${fileName}`;
+            document.getElementById('uploadIcon').className = 'fa-solid fa-image';
+
+            // Update the button UI
+            const btn = document.getElementById('imageSearchBtn');
+            btn.innerHTML = 'Find Now ✨';
+
+            // Change the button action from opening file picker to submitting form
+            btn.onclick = function (e) {
+                e.preventDefault();
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Analyzing...';
+                document.getElementById('imageSearchForm').submit();
+            };
+        }
+    });
+</script>
+<script>
+    // Hero Image Animation
+    const heroImg = document.getElementById('heroFoodImg');
+    const heroWrap = document.querySelector('.hero-banner');
+
+    if (heroImg && heroWrap) {
+        const images = [
+            "{% static 'images/hero1.png' %}",
+            "{% static 'images/hero2.png' %}",
+            "{% static 'images/hero3.png' %}",
+            "{% static 'images/hero4.png' %}"
+        ];
+        let currentImgIdx = 0;
+        let isPaused = false;
+        let isVisible = true;
+
+        // 1. Pause animation when scrolled out of view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                isVisible = entry.isIntersecting;
+            });
+        }, { threshold: 0.1 });
+        observer.observe(heroWrap);
+
+        // 2. Toggle pause on touch/click
+        heroImg.style.pointerEvents = 'auto'; // Re-enable pointer events for the image
+        heroImg.style.cursor = 'pointer';
+        heroImg.title = "Click to pause/resume animation";
+
+        heroImg.addEventListener('click', () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                heroImg.style.filter = 'drop-shadow(0 20px 30px rgba(0,0,0,0.15)) brightness(0.95)';
+            } else {
+                heroImg.style.filter = 'none';
+            }
+        });
+
+        setInterval(() => {
+            if (isPaused || !isVisible) return; // Skip cycle if paused or not visible
+
+            // Step 1: animate out (gentle scale down, slow fade out)
+            heroImg.style.transition = 'all 1s ease-in-out';
+            heroImg.style.transform = 'scale(0.95)';
+            heroImg.style.opacity = '0';
+
+            setTimeout(() => {
+                // Step 2: change image
+                currentImgIdx = (currentImgIdx + 1) % images.length;
+                heroImg.src = images[currentImgIdx];
+
+                // Pre-animate in state (slightly larger scale for floating in effect)
+                heroImg.style.transition = 'none'; // disable transition briefly to reset
+                heroImg.style.transform = 'scale(1.05)';
+
+                // Step 3: animate in (scale to 1, slow fade in)
+                setTimeout(() => {
+                    heroImg.style.transition = 'all 1.5s ease-out';
+                    heroImg.style.transform = 'scale(1)';
+                    heroImg.style.opacity = '1';
+                }, 50);
+            }, 1000); // Wait 1 second for fade out to finish completely
+        }, 5000);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,253 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .dish-wrapper {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .dish-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .dish-header-left h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 5px;
+    }
+
+    .dish-header-left p {
+        color: #6b7280;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .btn-admin-danger {
+        background: white;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-admin-danger:hover {
+        background: #fef2f2;
+    }
+
+    .dish-content-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .dish-hero {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .dish-body {
+        padding: 40px;
+    }
+
+    .dish-meta-row {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .meta-block {
+        flex: 1;
+    }
+
+    .meta-block h4 {
+        font-size: 13px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 8px;
+    }
+
+    .meta-block p {
+        font-size: 18px;
+        color: #1f2937;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .meta-block a {
+        color: var(--primary-orange);
+        text-decoration: none;
+    }
+    
+    .meta-block a:hover {
+        text-decoration: underline;
+    }
+
+    .recipe-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .detail-section h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .detail-section h3 i {
+        color: var(--primary-orange);
+    }
+
+    .ingr-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .ingr-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #f3f4f6;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .ingr-list li i {
+        color: #10b981;
+        font-size: 12px;
+    }
+
+    .step-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: step-counter;
+    }
+
+    .step-list li {
+        position: relative;
+        padding: 0 0 25px 40px;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+    .step-list li::before {
+        counter-increment: step-counter;
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: -2px;
+        width: 26px;
+        height: 26px;
+        background: var(--light-orange);
+        color: var(--primary-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dish-wrapper">
+    <div class="dish-header">
+        <div class="dish-header-left">
+            <h2>{{ data.name }}</h2>
+            <p>Uploaded by <a href="../viewUserAdmin/{{data.user.pk}}" style="color: var(--primary-orange); text-decoration: none; font-weight: 600;">{{ data.user.first_name|default:data.user.username }}</a></p>
+        </div>
+        <div>
+            <a href="../feedbacks/{{data.pk}}" class="btn btn-outline-secondary me-2"><i class="fa-regular fa-comments"></i> View Feedbacks</a>
+            <div class="dropdown" style="display: inline-block;">
+                <button class="btn-admin-danger dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Moderate
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item text-danger" href="../delete/{{data.pk}}" onclick="return confirm('Delete this recipe entirely?');"><i class="fa-regular fa-trash-can me-2"></i> Delete Recipe</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="../removeReport/{{data.pk}}" onclick="return confirm('Clear any reports for this recipe?');"><i class="fa-solid fa-check me-2"></i> Clear Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="dish-content-card">
+        <img src="{% if data.img %}{{ data.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80{% endif %}" alt="{{data.name}}" class="dish-hero">
+        
+        <div class="dish-body">
+            <div class="dish-meta-row">
+                <div class="meta-block">
+                    <h4>Cuisine</h4>
+                    <p>{{ data.cuisine }}</p>
+                </div>
+                <div class="meta-block">
+                    <h4>Category</h4>
+                    <p>{{ data.category }}</p>
+                </div>
+                <div class="meta-block">
+                    <h4>Prep Time</h4>
+                    <p>{{ data.prep }} mins</p>
+                </div>
+                <div class="meta-block">
+                    <h4>Cook Time</h4>
+                    <p>{{ data.cook }} mins</p>
+                </div>
+                <div class="meta-block">
+                    <h4>Engagement</h4>
+                    <p><i class="fa-solid fa-heart" style="color: #ef4444; font-size: 14px; margin-right: 4px;"></i> {{ data.likes }} Likes</p>
+                </div>
+            </div>
+
+            <div class="recipe-details-grid">
+                <div class="detail-section">
+                    <h3><i class="fa-solid fa-basket-shopping"></i> Ingredients</h3>
+                    <ul class="ingr-list">
+                        {% for j in ingr %}
+                        {% if data.pk == j.dish.pk %}
+                        <li><i class="fa-solid fa-check"></i> {{ j.item }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fa-solid fa-fire-burner"></i> Cooking Steps</h3>
+                    <ul class="step-list">
+                        {% for j in cook %}
+                        {% if data.pk == j.dish.pk %}
+                        <li>{{ j.steps }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

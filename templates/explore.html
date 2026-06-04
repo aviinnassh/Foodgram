@@ -1,0 +1,894 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Foodgram - Explore{% endblock %}
+
+{% block extra_css %}
+    <style>
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #fffaf5 0%, #fff3e6 100%);
+            border-radius: var(--radius-xl);
+            margin: 30px 80px 30px;
+            padding: 40px 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(249, 115, 22, 0.1);
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .hero-content {
+            max-width: 550px;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .hero-content h1 span {
+            color: var(--primary-orange);
+        }
+
+        .hero-content p {
+            color: #4b5563;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .hero-search-bar {
+            background: white;
+            padding: 8px 10px 8px 25px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            max-width: 550px;
+            border: 1px solid var(--border-light);
+        }
+
+        .hero-search-bar input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            font-size: 15px;
+            background: transparent;
+            color: var(--text-dark);
+        }
+
+        .btn-hero-search {
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-hero-search:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .hero-image-wrap {
+            width: 380px;
+            height: 260px;
+            z-index: 1;
+            margin-right: -20px;
+            position: relative;
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .hero-image-wrap:hover {
+            transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) scale(1.03);
+        }
+
+        .hero-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: -15px 20px 40px rgba(249, 115, 22, 0.25);
+            border: 8px solid white;
+        }
+
+
+        /* Categories Bar */
+        .categories-bar {
+            padding: 0 80px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .cat-pill {
+            padding: 10px 24px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+        }
+
+        .cat-pill i {
+            color: var(--text-dim);
+            font-size: 16px;
+        }
+
+        .cat-pill:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            transform: translateY(-2px);
+        }
+
+        .cat-pill:hover i {
+            color: var(--primary-orange);
+        }
+
+        .cat-pill.active {
+            background: var(--light-orange);
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .cat-pill.active i {
+            color: var(--primary-orange);
+        }
+
+        /* Main Container Layout */
+        .page-container {
+            padding: 0 80px;
+            margin-bottom: 60px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            padding-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 4px;
+            background: var(--primary-orange);
+            border-radius: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .sort-btn {
+            background: white;
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .view-toggles {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+            background: white;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-icon-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        /* Recipe Card (New Match to PNG) */
+        .recipe-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header-user {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-meta img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-card-more {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .card-img-wrap {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary-orange);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .heart-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            color: #ef4444;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px 20px;
+            flex-grow: 1;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-item {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-item a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-item i.fa-heart {
+            color: #ef4444;
+        }
+
+        .stat-item a.link-feedbacks {
+            color: var(--primary-orange);
+            font-weight: 500;
+        }
+
+        .card-content h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 15px;
+            color: var(--text-dark);
+        }
+
+        .recipe-info-line {
+            color: var(--text-dim);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .recipe-info-line i {
+            color: #9ca3af;
+        }
+
+        .recipe-info-line strong {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .card-footer-btns {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px 20px;
+        }
+
+        .btn-recipe {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-recipe-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-recipe-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-recipe-secondary {
+            background: var(--light-orange);
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-recipe-secondary:hover {
+            background: #ffe4cc;
+        }
+
+        .recipe-expanded-content {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Sidebar - Match to PNG */
+        .exact-ai-sidebar {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: 25px;
+            position: sticky;
+            top: 100px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .ai-title-block {
+            margin-bottom: 20px;
+        }
+
+        .ai-title-block h3 {
+            color: var(--text-dark);
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-title-block p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .ai-rec-card-sm {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            align-items: center;
+        }
+
+        .ai-rec-card-sm:hover {
+            border-color: #fbd38d;
+            background: #fffaf5;
+        }
+
+        .ai-thumb-sm {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .ai-info-sm {
+            flex-grow: 1;
+        }
+
+        .ai-info-sm h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 4px;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .ai-info-sm p {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin: 0;
+        }
+
+        .btn-get-more-ai {
+            width: 100%;
+            background: white;
+            border: 1px solid var(--primary-orange);
+            color: var(--primary-orange);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-get-more-ai:hover {
+            background: var(--light-orange);
+        }
+
+        .user-search-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+        }
+
+        .user-search-card:hover {
+            border-color: var(--primary-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 1200px) {
+            .page-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-image-wrap {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .categories-bar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero-banner {
+                padding: 30px;
+                height: auto;
+            }
+        }
+
+        /* Animated Sticky Search Option */
+        .sticky-search-container {
+            position: fixed;
+            top: 105px; /* Aligned beautifully under the main sticky navbar */
+            left: 0;
+            right: 0;
+            z-index: 990;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 12px 80px;
+            border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .sticky-brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1f2937;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .sticky-brand-text span {
+            color: var(--primary-orange);
+        }
+
+        .sticky-search-container.show-sticky {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sticky-search-wrapper {
+            flex-grow: 1;
+            max-width: 550px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .sticky-search-bar {
+            background: white;
+            padding: 6px 8px 6px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--primary-orange);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+            width: 100%;
+        }
+
+        .sticky-search-bar i {
+            color: var(--primary-orange);
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        .sticky-search-bar input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text-dark);
+        }
+
+        .btn-sticky-search {
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-sticky-search:hover {
+            background: var(--primary-dark);
+            transform: scale(1.03);
+        }
+
+        @media (max-width: 768px) {
+            .sticky-search-container {
+                top: 85px;
+                padding: 10px 20px;
+                justify-content: center;
+            }
+            .sticky-brand-text {
+                display: none;
+            }
+            .sticky-search-wrapper {
+                max-width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Sticky Search Option (Appears on Scroll) -->
+    <div class="sticky-search-container" id="stickySearch">
+        <div class="sticky-brand-text">
+            Explore Delicious <span>Recipes</span>
+        </div>
+        <div class="sticky-search-wrapper">
+            <form action="/explore" method="GET" class="sticky-search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Search for dish, cuisine, or user...">
+                <button type="submit" class="btn-sticky-search">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Explore Hero Banner -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <h1>Explore Delicious <span>Recipes</span></h1>
+            <p>Discover amazing recipes from around the world</p>
+            <form action="/explore" method="GET" class="hero-search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search for dish, cuisine, or user...">
+                <button type="submit" class="btn-hero-search">Search</button>
+            </form>
+        </div>
+        <div class="hero-image-wrap">
+            <img src="{% static 'images/foodgram_explore_hero_v2.png' %}"
+                alt="Delicious Gourmet Brunch">
+        </div>
+    </div>
+
+    <!-- Categories Row -->
+    <div class="categories-bar">
+        <a href="/explore" class="cat-pill {% if not q %}active{% endif %}"><i class="fa-solid fa-border-all"></i> All Categories</a>
+        <a href="/explore?q=breakfast" class="cat-pill {% if q == 'breakfast' %}active{% endif %}"><i class="fa-solid fa-mug-hot"></i> Breakfast</a>
+        <a href="/explore?q=lunch" class="cat-pill {% if q == 'lunch' %}active{% endif %}"><i class="fa-solid fa-utensils"></i> Lunch</a>
+        <a href="/explore?q=dinner" class="cat-pill {% if q == 'dinner' %}active{% endif %}"><i class="fa-solid fa-bell-concierge"></i> Dinner</a>
+        <a href="/explore?q=dessert" class="cat-pill {% if q == 'dessert' %}active{% endif %}"><i class="fa-solid fa-cake-candles"></i> Desserts</a>
+        <a href="/explore?q=healthy" class="cat-pill {% if q == 'healthy' %}active{% endif %}"><i class="fa-solid fa-leaf"></i> Healthy</a>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="page-container">
+        <!-- Left Column: Explore Recipes Grid -->
+        <div class="recipe-feed">
+
+            {% if searched_users %}
+            <div class="section-header mb-3">
+                <h2>Users</h2>
+            </div>
+            <div class="row g-3 mb-5">
+                {% for su in searched_users %}
+                <div class="col-md-6">
+                    <a href="{% url 'viewUser' su.pk %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center p-3 rounded user-search-card">
+                            <img src="{% if su.bio.img %}{{ su.bio.img.url }}{% else %}https://ui-avatars.com/api/?name={{ su.first_name }}&background=f97316&color=fff{% endif %}" alt="{{ su.first_name }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0" style="color: var(--text-dark); font-weight: 600;">{{ su.first_name }}</h6>
+                                <small style="color: var(--text-dim);">@{{ su.username }}</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="section-header mb-3">
+                <h2>Explore Recipes</h2>
+            </div>
+
+            {% if detected %}
+            <div class="alert alert-warning d-flex align-items-center gap-3 mb-4" style="border-radius: 12px; background-color: #fff8ec; border: 1px solid var(--primary-orange);">
+                <i class="fa-solid fa-camera" style="color: var(--primary-orange); font-size: 24px;"></i>
+                <div>
+                    <h5 style="margin: 0; color: var(--text-dark); font-weight: 700;">✨ AI detected <strong>{{ detected|title }}</strong> in your image!</h5>
+                    <p style="margin: 0; color: var(--text-dim); font-size: 14px;">We couldn't find an exact match for it, but here are some popular recipes instead.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row g-4" id="recipe-feed-container">
+                {% for i in dish %}
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    {% include 'post_card.html' %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <h4 class="text-muted">No recipes found matching your search.</h4>
+                </div>
+                {% endfor %}
+            </div>
+            {% if dish.has_next %}
+            <div id="infinite-scroll-trigger" data-url="?page={{ dish.next_page_number }}" style="text-align: center; padding: 20px;">
+                <i class="fa-solid fa-spinner fa-spin text-warning" style="font-size: 24px;"></i>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/java.js' %}"></script>
+    <script>
+        // Set active category pill based on URL search query
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+
+            if (query) {
+                const pills = document.querySelectorAll('.cat-pill');
+                pills.forEach(pill => pill.classList.remove('active'));
+
+                let foundMatch = false;
+                pills.forEach(pill => {
+                    const href = pill.getAttribute('href');
+                    if (href.includes('q=' + query.toLowerCase())) {
+                        pill.classList.add('active');
+                        foundMatch = true;
+                    }
+                });
+                if (!foundMatch && pills.length > 0) {
+                    // If no specific match, keep "All Categories" active
+                    pills[0].classList.add('active');
+                }
+            }
+        });
+
+        // Toggle Recipe Expanded Content
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('toggle-recipe-btn')) {
+                e.preventDefault();
+                const card = e.target.closest('.recipe-card');
+                if (card) {
+                    const content = card.querySelector('.recipe-expanded-content');
+                    if (content) {
+                        content.classList.toggle('show');
+                        if (content.classList.contains('show')) {
+                            content.style.display = 'block';
+                            e.target.innerText = 'Hide Recipe';
+                        } else {
+                            content.style.display = 'none';
+                            e.target.innerText = 'View Recipe';
+                        }
+                    }
+                }
+            }
+        });
+
+        // AI Button Animation
+        document.querySelectorAll(".ai-btn").forEach(btn => {
+            btn.addEventListener("click", function () {
+                this.innerHTML = '<i class="fa-solid fa-robot fa-spin me-2"></i> Thinking...';
+            });
+        });
+
+        // Sticky Search Bar Animation on Scroll
+        window.addEventListener('scroll', () => {
+            const stickySearch = document.getElementById('stickySearch');
+            const heroBanner = document.querySelector('.hero-banner');
+            if (stickySearch && heroBanner) {
+                // Trigger when user scrolls past the hero banner search bar
+                const triggerHeight = heroBanner.offsetTop + heroBanner.offsetHeight - 80;
+                if (window.scrollY > triggerHeight) {
+                    stickySearch.classList.add('show-sticky');
+                } else {
+                    stickySearch.classList.remove('show-sticky');
+                }
+            }
+        });
+    </script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/follow/')) {
+                    this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                } else if (href.startsWith('/unfollow/')) {
+                    this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+</script>
+{% endblock %}

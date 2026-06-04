@@ -1,0 +1,582 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Foodgram{% endblock %}
+
+{% block extra_css %}
+    <style>
+
+        /* Notifications Page Styles */
+        body {
+            background-color: #fafafa;
+        }
+
+        .notifications-wrapper {
+            max-width: 1150px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header Section */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .mark-all-read {
+            color: #f97316;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .mark-all-read:hover {
+            color: #ea580c;
+        }
+
+        /* Filters */
+        .filter-pills {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-pill:hover {
+            background: #f9fafb;
+            color: #1f2937;
+        }
+
+        .filter-pill.active {
+            background: #ffedd5;
+            color: #f97316;
+            border-color: #ffedd5;
+        }
+
+        /* Notification List */
+        .notifications-list {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background: #fafafa;
+        }
+
+        .notif-avatar {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .notif-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+
+        .notif-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            border: 2px solid white;
+        }
+
+        .badge-like {
+            background: #ef4444;
+        }
+
+        .badge-comment {
+            background: #3b82f6;
+        }
+
+        .badge-follow {
+            background: #22c55e;
+        }
+
+
+        .notif-content {
+            flex-grow: 1;
+            padding-right: 20px;
+        }
+
+        .notif-text {
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .notif-text strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .notif-recipe {
+            color: #f97316;
+            font-weight: 500;
+        }
+
+        .notif-subtext {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .notif-time {
+            font-size: 13px;
+            color: #9ca3af;
+            white-space: nowrap;
+            margin-right: 20px;
+        }
+
+        .notif-thumbnail {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background: #f97316;
+            border-radius: 50%;
+            flex-shrink: 0;
+            opacity: 0;
+        }
+
+        .notification-item.unread .unread-dot {
+            opacity: 1;
+        }
+
+        .notification-item.unread {
+            background: #fffaf5;
+            /* Very subtle orange tint for unread items */
+        }
+
+        .btn-load-more {
+            display: block;
+            width: max-content;
+            margin: 30px auto;
+            padding: 10px 25px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 50px;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-load-more:hover {
+            border-color: #d1d5db;
+            color: #1f2937;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Sidebar Cards */
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        /* Settings Toggles */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        /* Custom Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f97316;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #f97316;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #f97316;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .btn-outline-orange {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #fbd38d;
+            background: white;
+            color: #f97316;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-outline-orange:hover {
+            background: #fffaf5;
+            border-color: #f97316;
+        }
+
+        /* Quick Links */
+        .quick-link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .quick-link-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .quick-link-item:hover {
+            color: #f97316;
+            padding-left: 5px;
+        }
+
+        .link-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .link-left i {
+            color: #6b7280;
+            width: 16px;
+        }
+
+        .quick-link-item:hover .link-left i {
+            color: #f97316;
+        }
+
+        .link-right i {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="notifications-wrapper">
+        <div class="row">
+            <!-- Main Content: Full Width -->
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div>
+                        <h2>Notifications</h2>
+                        <p>Stay updated with what's happening in your Foodgram</p>
+                    </div>
+                    <a href="#" class="mark-all-read">
+                        <i class="fa-regular fa-circle-check"></i> Mark all as read
+                    </a>
+                </div>
+
+                <div class="filter-pills">
+                    <a href="#" class="filter-pill active"><i class="fa-solid fa-border-all"></i> All</a>
+                    <a href="#" class="filter-pill"><i class="fa-regular fa-heart"></i> Likes</a>
+                    <a href="#" class="filter-pill"><i class="fa-regular fa-comment"></i> Comments</a>
+                    <a href="#" class="filter-pill"><i class="fa-solid fa-user-group"></i> Follows</a>
+                </div>
+
+                <div class="notifications-list">
+                    {% for notification in notifications %}
+                    <div class="notification-item {% if not notification.read %}unread{% endif %}" data-type="{% if 'liked' in notification.message|lower %}like{% elif 'comment' in notification.message|lower %}comment{% elif 'follow' in notification.message|lower %}follow{% else %}other{% endif %}">
+                        <!-- Avatar placeholder with random dynamic styling based on index -->
+                        <div class="notif-avatar">
+                            {% if notification.sender and notification.sender.bio.img %}
+                                <img src="{{ notification.sender.bio.img.url }}"
+                                    onerror="this.src='https://ui-avatars.com/api/?name={{ notification.sender.username }}&background=random'"
+                                    alt="Avatar">
+                            {% else %}
+                                <img src="{% static 'images/default_profile.jpg' %}"
+                                    onerror="this.src='https://ui-avatars.com/api/?name={{ notification.sender.username }}&background=random'"
+                                    alt="Avatar">
+                            {% endif %}
+                            {% if 'liked' in notification.message|lower %}
+                            <div class="notif-badge badge-like"><i class="fa-solid fa-heart"></i></div>
+                            {% elif 'comment' in notification.message|lower %}
+                            <div class="notif-badge badge-comment"><i class="fa-solid fa-comment"></i></div>
+                            {% elif 'follow' in notification.message|lower %}
+                            <div class="notif-badge badge-follow"><i class="fa-solid fa-user-plus"></i></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="notif-content">
+                            <div class="notif-text">
+                                {% if notification.sender %}
+                                    <strong><a href="/viewUser/{{ notification.sender.id }}" style="color: inherit; text-decoration: none;">{{ notification.sender.first_name|default:notification.sender.username }}</a></strong> {{ notification.message }}
+                                {% else %}
+                                    <strong>Someone</strong> {{ notification.message }}
+                                {% endif %}
+                            </div>
+                            <!-- Mock subtext to match the design aesthetics -->
+                            <div class="notif-subtext">Tap to view details.</div>
+                        </div>
+
+                        <div class="notif-time">Just now</div>
+
+                        <!-- Only show unread dot if unread -->
+                        <div class="unread-dot"></div>
+                    </div>
+                    {% empty %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="fa-regular fa-bell-slash mb-3" style="font-size: 32px;"></i>
+                        <p>No new notifications</p>
+                    </div>
+                    {% endfor %}
+
+
+                </div>
+
+                <button class="btn-load-more">Load More <i class="fa-solid fa-chevron-down ms-1"></i></button>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Mark All As Read Logic
+        const markAllReadBtn = document.querySelector('.mark-all-read');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                });
+            });
+        }
+        
+        // Notification Filtering Logic
+        const filterPills = document.querySelectorAll('.filter-pill');
+        const notifItems = document.querySelectorAll('.notification-item');
+
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active visual state
+                filterPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                // Determine what to filter by looking at the text
+                const filterText = this.textContent.trim().toLowerCase();
+                
+                let count = 0;
+                notifItems.forEach(item => {
+                    // Skip the empty state placeholder if it exists
+                    if(!item.hasAttribute('data-type')) return;
+                    
+                    const type = item.getAttribute('data-type');
+                    
+                    let shouldShow = false;
+                    if (filterText === 'all') {
+                        shouldShow = true;
+                    } else if (filterText === 'likes' && type === 'like') {
+                        shouldShow = true;
+                    } else if (filterText === 'comments' && type === 'comment') {
+                        shouldShow = true;
+                    } else if (filterText === 'follows' && type === 'follow') {
+                        shouldShow = true;
+                    }
+
+                    if (shouldShow) {
+                        item.style.display = 'flex';
+                        count++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Follow / Unsave button visual updates
+        document.querySelectorAll('a[href^="/save/"], a[href^="/unsave/"], a[href^="/report/"], a[href^="/follow/"], a[href^="/unfollow/"]').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                // Visual update immediately for snappiness
+                if (href.startsWith('/save/')) {
+                    this.setAttribute('href', href.replace('/save/', '/unsave/'));
+                    this.innerHTML = '<i class="fa-solid fa-bookmark me-2"></i> Unsave';
+                } else if (href.startsWith('/unsave/')) {
+                    this.setAttribute('href', href.replace('/unsave/', '/save/'));
+                    this.innerHTML = '<i class="fa-regular fa-bookmark me-2"></i> Save';
+                } else if (href.startsWith('/follow/')) {
+                    this.setAttribute('href', href.replace('/follow/', '/unfollow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-minus"></i> Unfollow';
+                } else if (href.startsWith('/unfollow/')) {
+                    this.setAttribute('href', href.replace('/unfollow/', '/follow/'));
+                    this.innerHTML = '<i class="fa-solid fa-user-plus"></i> Follow';
+                } else if (href.startsWith('/report/')) {
+                    this.innerHTML = '<i class="fa-solid fa-check me-2"></i> Reported';
+                    this.style.pointerEvents = 'none';
+                }
+
+                // Send background request
+                fetch(href, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).catch(err => console.error("Error:", err));
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .reports-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .report-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .report-card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .rc-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .rc-details {
+        flex-grow: 1;
+    }
+
+    .rc-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 4px;
+        text-decoration: none;
+    }
+    
+    .rc-title:hover {
+        color: var(--primary-orange);
+    }
+
+    .rc-meta {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .rc-reporter {
+        font-size: 13px;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .rc-reporter a {
+        font-weight: 600;
+        color: var(--text-dark);
+        text-decoration: none;
+    }
+    
+    .rc-reporter a:hover {
+        color: var(--primary-orange);
+    }
+
+    .rc-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .btn-rc {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-rc-view {
+        background: #fffaf5;
+        color: var(--primary-orange);
+        border: 1px solid #fbd38d;
+    }
+
+    .btn-rc-view:hover {
+        background: #ffedd5;
+    }
+
+    .btn-rc-resolve {
+        background: white;
+        color: #10b981; /* Green */
+        border: 1px solid #a7f3d0;
+    }
+
+    .btn-rc-resolve:hover {
+        background: #ecfdf5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-main">
+    <div class="admin-header">
+        <div>
+            <h2>Reported Content</h2>
+            <p>Review recipes that have been flagged by the community.</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="font-weight: 600; color: #ef4444; margin:0; font-size: 24px;">{{ data|length }}</p>
+            <p style="font-size: 12px; color: #6b7280; text-transform: uppercase; margin:0; letter-spacing: 1px;">Pending Reports</p>
+        </div>
+    </div>
+
+    <div class="reports-list">
+        {% for i in data %}
+        <div class="report-card">
+            <img src="{% if i.dish.img %}{{ i.dish.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60{% endif %}" alt="{{i.dish.name}}" class="rc-img">
+            
+            <div class="rc-details">
+                <a href="adminDish/{{i.dish.pk}}" class="rc-title">{{ i.dish.name }}</a>
+                <div class="rc-meta">Cuisine: {{ i.dish.cuisine }} • Category: {{ i.dish.category }}</div>
+                
+                <div class="rc-reporter">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                    Reported by <a href="viewUserAdmin/{{i.user.pk}}">{{ i.user.first_name|default:i.user.username }}</a>
+                </div>
+            </div>
+            
+            <div class="rc-actions">
+                <a href="adminDish/{{i.dish.pk}}" class="btn-rc btn-rc-view">Review Dish</a>
+                <a href="/removeReport/{{i.pk}}" class="btn-rc btn-rc-resolve" onclick="return confirm('Mark this report as resolved?');">Resolve Report</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center" style="padding: 60px 20px; background: white; border-radius: 16px; border: 1px solid #e5e7eb;">
+            <i class="fa-regular fa-circle-check" style="font-size: 48px; color: #10b981; margin-bottom: 20px;"></i>
+            <h3 style="font-size: 20px; font-weight: 600; color: #1f2937;">All clear!</h3>
+            <p style="color: #6b7280; margin: 0;">There are no pending reports to review.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

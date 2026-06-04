@@ -1,0 +1,267 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Profile Layout */
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 40px;
+    }
+
+    .profile-card-top {
+        background-color: #fef2f2; /* Light red/admin tint */
+        background-image: radial-gradient(#fecaca 1px, transparent 1px);
+        background-size: 30px 30px;
+        padding: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .profile-info-main {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        object-fit: cover;
+        background-color: #ef4444;
+    }
+
+    .profile-details h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .profile-details .email {
+        font-size: 15px;
+        color: #4b5563;
+        margin-bottom: 12px;
+    }
+
+    .profile-details .bio {
+        font-size: 15px;
+        color: #1f2937;
+        font-weight: 500;
+    }
+
+    /* Stats Row */
+    .profile-stats {
+        display: flex;
+        padding: 25px 0;
+        background: white;
+    }
+
+    .stat-item {
+        flex: 1;
+        text-align: center;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .stat-item:last-child {
+        border-right: none;
+    }
+
+    .stat-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #4b5563;
+        font-weight: 500;
+    }
+
+    /* Admin Grid */
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .ac-img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .ac-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ac-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 5px;
+    }
+
+    .ac-category {
+        font-size: 13px;
+        color: var(--primary-orange);
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .ac-stats {
+        display: flex;
+        gap: 15px;
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 20px;
+    }
+
+    .ac-stats i {
+        color: #9ca3af;
+        margin-right: 5px;
+    }
+
+    .ac-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+    }
+
+    .btn-ac {
+        flex: 1;
+        text-align: center;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-ac-view {
+        background: #fffaf5;
+        color: var(--primary-orange);
+        border: 1px solid #fbd38d;
+    }
+
+    .btn-ac-view:hover {
+        background: #ffedd5;
+    }
+
+    .btn-ac-del {
+        background: white;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+    }
+
+    .btn-ac-del:hover {
+        background: #fef2f2;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-main">
+    
+    <!-- Top Profile Card -->
+    <div class="profile-card">
+        <div class="profile-card-top">
+            <div class="profile-info-main">
+                <img src="{% if user.bio.img %}{{ user.bio.img.url }}{% else %}https://ui-avatars.com/api/?name={{user.first_name|default:user.username}}&background=random&color=fff{% endif %}" alt="Profile Avatar" class="profile-avatar">
+                <div class="profile-details">
+                    <h2>{{ user.first_name|default:user.username }} <span class="badge bg-secondary" style="font-size: 12px; font-weight: 600;">@{{user.username}}</span></h2>
+                    <div class="email">{{ user.email|default:"No email provided" }}</div>
+                    <div class="bio">{{ user.bio.bio|default:"No bio available." }}</div>
+                </div>
+            </div>
+            <!-- Admin Actions for User -->
+            <!-- e.g. Ban User / Send Warning -->
+        </div>
+
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-num">{{ post }}</div>
+                <div class="stat-label">Recipes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{{ followers }}</div>
+                <div class="stat-label">Followers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{{ following }}</div>
+                <div class="stat-label">Following</div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="section-title">User's Recipes</h3>
+    
+    <div class="admin-grid">
+        {% for i in dish %}
+        <div class="admin-card">
+            <img src="{% if i.img %}{{ i.img.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60{% endif %}" alt="{{i.name}}" class="ac-img">
+            
+            <div class="ac-body">
+                <h3 class="ac-title">{{ i.name|truncatechars:35 }}</h3>
+                <div class="ac-category">{{ i.cuisine }} • {{ i.category }}</div>
+                
+                <div class="ac-stats">
+                    <span><i class="fa-regular fa-clock"></i> {{ i.prep|add:i.cook }}m</span>
+                    <span><i class="fa-solid fa-heart" style="color: #ef4444;"></i> {{ i.likes }}</span>
+                </div>
+                
+                <div class="ac-actions">
+                    <a href="../adminDish/{{i.pk}}" class="btn-ac btn-ac-view">View Details</a>
+                    <a href="../../delete/{{i.pk}}" class="btn-ac btn-ac-del" onclick="return confirm('Delete this recipe?');"><i class="fa-regular fa-trash-can"></i></a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6b7280; background: white; border-radius: 12px; border: 1px dashed #d1d5db;">
+            This user hasn't posted any recipes yet.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
