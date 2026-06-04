@@ -1,7 +1,5 @@
 # 🍽️ Foodgram
 
-![Foodgram Banner](static/images/login_bg_enhanced.png)
-
 **Foodgram** is a modern, dynamic, and fully-featured social platform designed specifically for food lovers, home cooks, and professional chefs. Discover new recipes, share your culinary creations, and connect with a vibrant community of food enthusiasts. Powered by AI, Foodgram also offers personalized recipe recommendations and image-based search capabilities.
 
 ---
